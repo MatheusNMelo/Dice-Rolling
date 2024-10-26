@@ -1,8 +1,6 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 
-const response = await fetch('http://localhost:5000/generate-sudoku');
-console.log(response.json());
 async function generateNewSudoku() {
   const response = await fetch('http://localhost:5000/generate-sudoku');
   if (!response.ok) {
@@ -25,6 +23,7 @@ function App() {
       } catch (error) {
         console.error("Error fetching Sudoku:", error);
       }
+      setLoading(false);
     };
 
     fetchSudoku();
