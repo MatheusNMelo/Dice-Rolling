@@ -150,7 +150,7 @@ function App() {
     <div className="App">
       {loading ? <p>Loading...</p> : (
         <div className="App-header">
-          <h3>Sudoku Solver</h3>
+          <h3>Truly Random Sudoku Generator</h3>
           <div>
             <button className="newPuzzle" onClick={generateSeedPuzzle}>New Puzzle</button>
           </div>

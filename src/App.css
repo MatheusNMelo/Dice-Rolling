@@ -1,82 +1,152 @@
+/* App.css */
+
+body {
+  font-family: 'Arial', sans-serif;
+  /* Change to a stylish font */
+  background-color: #f0f0f0;
+  /* Light background */
+  margin: 0;
+  /* Remove default margin */
+}
+
 .App {
   text-align: center;
 }
 
 .App-header {
   background-color: #282c34;
+  /* Dark background for header */
   min-height: 100vh;
+  /* Full height */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
-}
-
-.cellInput {
-  width: 50px;
-  height: 50px;
-  font-size: 30px;
-  text-align: center;
-  padding: 0px;
-  border: 1px solid black;
+  border-radius: 10px;
+  /* Rounded corners */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  /* Subtle shadow */
 }
 
 table {
   border-collapse: collapse;
+  /* Remove space between cells */
   border: 3px solid bisque;
+  /* Border for the table */
   background-color: bisque;
+  /* Background color for the table */
+  border-radius: 10px;
+  /* Rounded corners for the table */
+  overflow: hidden;
+  /* Prevent overflow */
 }
 
 td {
   padding: 0;
+  /* No padding */
+}
+
+.cellInput {
+  width: 50px;
+  /* Fixed width */
+  height: 50px;
+  /* Fixed height */
+  font-size: 30px;
+  /* Font size for input */
+  text-align: center;
+  /* Center text */
+  padding: 0;
+  /* No padding */
+  border: 1px solid #ccc;
+  /* Light border */
+  border-radius: 5px;
+  /* Rounded corners */
+  background-color: #fff;
+  /* White background for inputs */
+  transition: background-color 0.3s;
+  /* Smooth transition */
+}
+
+.cellInput:focus {
+  outline: none;
+  /* Remove default outline */
+  background-color: #e0f7fa;
+  /* Light blue background on focus */
+}
+
+.cellInput:hover {
+  background-color: #f1f1f1;
+  /* Light gray on hover */
 }
 
 .buttonContainer {
   margin-top: 20px;
+  /* Space above buttons */
+}
+
+button {
+  font-weight: bold;
+  /* Bold text */
+  padding: 12px 20px;
+  /* Padding for buttons */
+  border: none;
+  /* Remove default border */
+  border-radius: 20px;
+  /* Rounded corners */
+  font-size: 14px;
+  /* Font size */
+  transition: background-color 0.3s, transform 0.1s;
+  /* Smooth transition */
 }
 
 .solveButton {
   background-color: orange;
-  font-weight: bold;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 20px;
-  font-size: 14px;
-  margin: 0px 20px;
+  /* Color for solve button */
+}
+
+.solveButton:hover {
+  background-color: darkorange;
+  /* Darker shade on hover */
 }
 
 .checkButton {
   background-color: tomato;
-  font-weight: bold;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 20px;
-  font-size: 14px;
+  /* Color for check button */
+}
+
+.checkButton:hover {
+  background-color: darkred;
+  /* Darker shade on hover */
 }
 
 .resetButton {
   background-color: aqua;
-  font-weight: bold;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 20px;
-  font-size: 14px;
+  /* Color for reset button */
+}
+
+.resetButton:hover {
+  background-color: deepskyblue;
+  /* Darker shade on hover */
 }
 
 .newPuzzle {
   background-color: beige;
-  font-weight: bold;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 20px;
-  font-size: 14px;
+  /* Color for new puzzle button */
+}
+
+.newPuzzle:hover {
+  background-color: #e0cba8;
+  /* Darker shade on hover */
 }
 
 .bBorder {
   border-bottom: 2px solid black;
+  /* Thicker bottom border for 3x3 separation */
 }
 
 .rBorder {
   border-right: 2px solid black;
+  /* Thicker right border for 3x3 separation */
 }
