@@ -1,0 +1,12 @@
+/* src/components/Header.css */
+
+.header {
+  background-color: #282c34;
+  /* Header background color */
+  color: white;
+  /* Text color */
+  padding: 20px;
+  /* Padding around the header */
+  text-align: center;
+  /* Center the text */
+}

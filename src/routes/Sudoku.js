@@ -1,4 +1,4 @@
-import './App.css';
+import './Sudoku.css'; // Optional: if you have specific styles for Sudoku
 import { useState, useEffect } from 'react';
 
 async function generateNewSudoku() {
@@ -9,10 +9,11 @@ async function generateNewSudoku() {
   return await response.json();
 }
 
-function App() {
+function Sudoku() {
   const [sudokuArr, setSudokuArr] = useState([]);
   const [initial, setInitial] = useState([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchSudoku = async () => {
       setLoading(true);
@@ -147,9 +148,9 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="Sudoku">
       {loading ? <p>Loading...</p> : (
-        <div className="App-header">
+        <div className="Sudoku-header">
           <h3>Truly Random Sudoku Generator</h3>
           <div>
             <button className="newPuzzle" onClick={generateSeedPuzzle}>New Puzzle</button>
@@ -183,4 +184,4 @@ function App() {
   );
 }
 
-export default App;
+export default Sudoku;
