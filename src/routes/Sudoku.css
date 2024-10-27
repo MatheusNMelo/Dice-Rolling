@@ -1,0 +1,143 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+  /* Center horizontally */
+  align-items: center;
+  /* Center vertically */
+  height: 90vh;
+  /* Full viewport height */
+}
+
+.App-header {
+  background-color: #282c34;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  margin: 0 auto;
+  /* Center horizontally */
+  max-width: 600px;
+  /* Set a max width for the header */
+}
+
+.tableContainer {
+  display: flex;
+  justify-content: center;
+  /* Center the table */
+  margin-top: 20px;
+  /* Optional: Add some spacing */
+}
+
+table {
+  border-collapse: collapse;
+  border: 3px solid bisque;
+  background-color: bisque;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+td {
+  padding: 0;
+}
+
+.cellInput {
+  width: 50px;
+  /* Adjust for individual cell width */
+  height: 50px;
+  /* Adjust for individual cell height */
+  font-size: 30px;
+  /* Adjust font size */
+  text-align: center;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  transition: background-color 0.3s;
+}
+
+.cellInput:focus {
+  outline: none;
+  background-color: #e0f7fa;
+}
+
+.cellInput:hover {
+  background-color: #f1f1f1;
+}
+
+.buttonContainer {
+  margin-top: 20px;
+}
+
+button {
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+.solveButton {
+  background-color: orange;
+}
+
+.solveButton:hover {
+  background-color: darkorange;
+}
+
+.checkButton {
+  background-color: tomato;
+}
+
+.checkButton:hover {
+  background-color: darkred;
+}
+
+.resetButton {
+  background-color: aqua;
+}
+
+.resetButton:hover {
+  background-color: deepskyblue;
+}
+
+.newPuzzle {
+  background-color: beige;
+}
+
+.newPuzzle:hover {
+  background-color: #e0cba8;
+}
+
+.bBorder {
+  border-bottom: 2px solid black;
+}
+
+.rBorder {
+  border-right: 2px solid black;
+}
+
+tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+button:focus {
+  outline: 2px solid #007BFF;
+  outline-offset: 2px;
+}
