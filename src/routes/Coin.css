@@ -1,0 +1,93 @@
+.bg-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #282c34;
+  min-height: 90vh;
+}
+
+.app-container {
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 30px;
+  min-width: 50%;
+  min-height: 500px;
+}
+
+.image {
+  width: 100px;
+}
+
+.count-container {
+  display: flex;
+  justify-content: space-around;
+  min-width: 50%;
+}
+
+.button {
+  color: #a35200;
+  background-color: #f9d423;
+  min-width: 80px;
+  min-height: 25px;
+  border-radius: 8px;
+  border: 0px;
+  cursor: pointer;
+}
+
+
+#coin.heads {
+  animation: flipHeads 1s ease-out forwards;
+}
+
+#coin.tails {
+  animation: flipTails 1s ease-out forwards;
+}
+
+#coin {
+  transition: -webkit-transform 1s ease-in;
+  transform-style: preserve-3d;
+}
+
+#coin div {
+  position: absolute;
+  backface-visibility: hidden;
+}
+
+.side-a {
+  z-index: 100;
+}
+
+.side-b {
+  transform: rotateY(-180deg);
+}
+
+@keyframes flipHeads {
+  from {
+    -webkit-transform: rotateY(0);
+    -moz-transform: rotateY(0);
+    transform: rotateY(0);
+  }
+
+  to {
+    -webkit-transform: rotateY(540deg);
+    -moz-transform: rotateY(540deg);
+    transform: rotateY(540deg);
+  }
+}
+
+@keyframes flipTails {
+  from {
+    -webkit-transform: rotateY(0);
+    -moz-transform: rotateY(0);
+    transform: rotateY(0);
+  }
+
+  to {
+    -webkit-transform: rotateY(720deg);
+    -moz-transform: rotateY(720deg);
+    transform: rotateY(720deg);
+  }
+}

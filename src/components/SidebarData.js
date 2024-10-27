@@ -16,6 +16,12 @@ export const SidebarData = [
     icons: <FaIcons.FaCartPlus />,
     cName: "nav-text",
   },
+  {
+    title: "Coin",
+    path: "/coin",
+    icons: <FaIcons.FaCartPlus />,
+    cName: "nav-text",
+  },
 ];
 
 export default SidebarData;

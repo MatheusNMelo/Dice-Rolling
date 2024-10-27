@@ -11,6 +11,7 @@ import {
 import Home from "./routes/Home";
 import Navbar from "./components/Navbar";
 import Sudoku from "./routes/Sudoku";
+import Coin from "./routes/Coin";
 import "./App.css";
 
 const AppLayout = () => (
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: "sudoku",
         element: <Sudoku />,
+      },
+      {
+        path: "coin",
+        element: <Coin />,
       },
     ],
   },
