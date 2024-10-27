@@ -12,7 +12,7 @@ export const SidebarData = [
   },
   {
     title: "Sudoku",
-    path: "/",
+    path: "/sudoku",
     icons: <FaIcons.FaCartPlus />,
     cName: "nav-text",
   },

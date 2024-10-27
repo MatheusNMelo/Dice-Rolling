@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { createRoot } from "react-dom/client";
 import {
   createBrowserRouter,
@@ -7,26 +7,34 @@ import {
   Link,
   Outlet,
   createRoutesFromElements,
-} from 'react-router-dom';
-import Header from './components/Header';
-import Navbar from './components/Navbar';
-import Sudoku from './routes/Sudoku';
-import Home from './routes/Home';
-import './App.css';
+} from "react-router-dom";
+import Home from "./routes/Home";
+import Navbar from "./components/Navbar";
+import Sudoku from "./routes/Sudoku";
+import "./App.css";
 
-const AppLayout = () => {
+const AppLayout = () => (
   <>
     <Navbar />
     <Outlet />
   </>
-};
+);
 
-const router = createBrowserRouter(createRoutesFromElements(
-  <Route element={<AppLayout />}>
-    <Route path="/" element={<Home />} />
-    <Route path="/sudoku" element={<Sudoku />} />
-  </Route>
-))
+const router = createBrowserRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "sudoku",
+        element: <Sudoku />,
+      },
+    ],
+  },
+]);
 
 createRoot(document.getElementById("root")).render(
   <RouterProvider router={router} />

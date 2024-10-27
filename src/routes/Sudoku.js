@@ -148,9 +148,9 @@ function Sudoku() {
   }
 
   return (
-    <div className="Sudoku">
+    <div className="App">
       {loading ? <p>Loading...</p> : (
-        <div className="Sudoku-header">
+        <div className="App-header">
           <h3>Truly Random Sudoku Generator</h3>
           <div>
             <button className="newPuzzle" onClick={generateSeedPuzzle}>New Puzzle</button>

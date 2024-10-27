@@ -8,8 +8,7 @@
 }
 
 .home,
-.reports,
-.products {
+.sudoku {
   display: flex;
   height: 90vh;
   align-items: center;
