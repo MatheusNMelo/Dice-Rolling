@@ -12,7 +12,8 @@ import Home from "./routes/Home";
 import Navbar from "./components/Navbar";
 import Sudoku from "./routes/Sudoku";
 import Coin from "./routes/Coin";
-import "./App.css";
+import RollDice from "./routes/RollDice";
+import "./components/Navbar.css";
 
 const AppLayout = () => (
   <>
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "coin",
         element: <Coin />,
+      },
+      {
+        path: "rolldice",
+        element: <RollDice />,
       },
     ],
   },

@@ -19,9 +19,13 @@ export const SidebarData = [
   {
     title: "Coin",
     path: "/coin",
-    icons: <FaIcons.FaCartPlus />,
+    icons: <IoIcons.IoIosPaper />,
+    cName: "nav-text",
+  },
+  {
+    title: "Dices",
+    path: "/rolldice",
+    icons: <IoIcons.IoIosPaper />,
     cName: "nav-text",
   },
 ];
-
-export default SidebarData;
