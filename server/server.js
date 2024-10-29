@@ -14,7 +14,6 @@ app.get('/', (req, res) => {
 
 app.get('/generate-sudoku', async (req, res) => {
   try {
-    // Load the Python functions
     await python.ex`
       import json
       import random
@@ -55,14 +54,61 @@ app.get('/generate-sudoku', async (req, res) => {
           return json.dumps(result)
     `;
 
-    // Call the function to generate Sudoku
     const sudokuJson = await python`generate_sudoku()`;
-    const sudoku = JSON.parse(sudokuJson); // Parse JSON string into a JavaScript object
+    const sudoku = JSON.parse(sudokuJson);
 
     res.json(sudoku);
   } catch (error) {
     console.error('Error executing Python code:', error);
     res.status(500).send('Error generating Sudoku');
+  }
+});
+
+app.get('/flip-coin', async (req, res) => {
+  try {
+    await python.ex`
+      import json
+      import random
+      import requests
+
+      def get_external_data():
+          url = "https://beacon.nist.gov/beacon/2.0/pulse/last"
+          response = None
+
+          try:
+              response = requests.get(url, timeout=3)
+              response.raise_for_status()
+          except requests.exceptions.Timeout:
+              print("Timed out =(")
+              return None
+          except requests.exceptions.RequestException as e:
+              print(f"An error occurred: {e}")
+              return None
+
+          if response.status_code == 200:
+              data = response.json()
+              output = data["pulse"]["outputValue"]
+              return int(output, 16)
+
+      def get_seed():
+          decimal = str(get_external_data())
+          sample = int("".join(random.sample(decimal, int((len(decimal)) / 2))))
+          return sample
+
+      def flip_coin():
+          SEEDED = get_seed()
+          random.seed(SEEDED)
+          flip = random.randint(0,1)  # Change the range as needed
+          return json.dumps(flip)
+    `;
+
+    const flipJson = await python`flip_coin()`;
+    const coin = JSON.parse(flipJson);
+
+    res.json(coin);
+  } catch (error) {
+    console.error('Error executing Python code:', error);
+    res.status(500).send('Error flipping coin');
   }
 });
 
