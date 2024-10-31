@@ -1,45 +1,63 @@
-/* Die.css File */
-/* Styling each Die */
 .Die {
-  font-size: 10em;
-  padding: 0.25em;
-  color: slateblue;
+  width: 100px;
+  /* Set width for the die */
+  height: 100px;
+  /* Set height for the die */
+  border: 2px solid #333;
+  /* Border for the die */
+  border-radius: 10px;
+  /* Rounded corners */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  /* Font size for the numbers */
+  margin: 10px;
+  /* Margin between dice */
+  transition: transform 0.5s;
+  /* Smooth transition for rolling effect */
 }
 
-/* Applying Animation */
-.Die-shaking {
-  animation-name: wobble;
-  animation-duration: 1s;
+.Die-rolling {
+  animation: roll 1s infinite;
+  /* Rolling animation */
 }
 
-/* Setting Animation effect to the 
-   dice using css keyframe */
-@keyframes wobble {
-  from {
-    transform: translate3d(0, 0, 0);
+@keyframes roll {
+  0% {
+    transform: rotate(0);
   }
 
-  15% {
-    transform: translate3d(-25%, 0, 0) rotate3d(0, 0, 1, -5deg);
+  50% {
+    transform: rotate(360deg);
   }
 
-  30% {
-    transform: translate3d(20%, 0, 0) rotate3d(0, 0, 1, 3deg);
+  100% {
+    transform: rotate(0);
   }
+}
 
-  45% {
-    transform: translate3d(-15%, 0, 0) rotate3d(0, 0, 1, -3deg);
-  }
+/* Styles for different faces of the die */
+.Die-face-one {
+  background-color: white;
+}
 
-  60% {
-    transform: translate3d(10%, 0, 0) rotate3d(0, 0, 1, 2deg);
-  }
+.Die-face-two {
+  background-color: lightgray;
+}
 
-  75% {
-    transform: translate3d(-5%, 0, 0) rotate3d(0, 0, 1, -1deg);
-  }
+.Die-face-three {
+  background-color: lightblue;
+}
 
-  to {
-    transform: translate3d(0, 0, 0);
-  }
+.Die-face-four {
+  background-color: lightgreen;
+}
+
+.Die-face-five {
+  background-color: lightyellow;
+}
+
+.Die-face-six {
+  background-color: lightcoral;
 }

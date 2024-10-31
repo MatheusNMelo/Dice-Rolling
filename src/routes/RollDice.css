@@ -1,39 +1,110 @@
-/* RollDice.css File */
-.RollDice {
+.bg-container {
   display: flex;
-  flex-flow: column nowrap;
-  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: #282c34;
+  min-height: 90vh;
 }
 
-/* Shows each dice in one row */
+.RollDice {
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 .RollDice-container {
   display: flex;
   justify-content: center;
-  align-content: center;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-/* Styling rolldice button */
-.RollDice button {
-  width: 15em;
-  padding: 1.5em;
-  border: 0px;
+.Die {
+  width: 100px;
+  /* Set width for the die */
+  height: 100px;
+  /* Set height for the die */
+  border: 2px solid #333;
+  /* Border for the die */
   border-radius: 10px;
-  color: white;
-  background-color: black;
-  margin-top: 3em;
-  align-self: center;
+  /* Rounded corners */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  /* Font size for the numbers */
+  margin: 10px;
+  /* Margin between dice */
+  transition: transform 0.5s;
+  /* Smooth transition for rolling effect */
 }
 
-/* Setting hover effect on button */
-.RollDice button:hover {
+.Die-rolling {
+  animation: roll 1s infinite;
+  /* Rolling animation */
+}
+
+@keyframes roll {
+  0% {
+    transform: rotate(0);
+  }
+
+  50% {
+    transform: rotate(360deg);
+  }
+
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.button {
+  color: #a35200;
+  background-color: #f9d423;
+  min-width: 80px;
+  min-height: 40px;
+  border-radius: 8px;
+  border: 0;
   cursor: pointer;
-  background-color: rgb(34, 33, 33);
-
+  font-size: 1rem;
+  transition: background-color 0.3s;
 }
 
-.RollDice-rolling {
-  border: 0px;
-  border-radius: 10px;
-  background-color: darkslateblue !important;
-  opacity: 0.7
+.button:hover {
+  background-color: #e0c200;
+  /* Slightly darker on hover */
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.input-container label {
+  margin: 5px;
+  font-size: 1rem;
+  color: #333;
+}
+
+select,
+input[type="number"] {
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+select:focus,
+input[type="number"]:focus {
+  outline: none;
+  border-color: #a35200;
+  /* Border color on focus */
 }
