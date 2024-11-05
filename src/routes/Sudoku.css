@@ -7,11 +7,8 @@ body {
 .App {
   display: flex;
   justify-content: center;
-  /* Center horizontally */
   align-items: center;
-  /* Center vertically */
   height: 90vh;
-  /* Full viewport height */
 }
 
 .App-header {
@@ -27,17 +24,13 @@ body {
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   margin: 0 auto;
-  /* Center horizontally */
   max-width: 600px;
-  /* Set a max width for the header */
 }
 
 .tableContainer {
   display: flex;
   justify-content: center;
-  /* Center the table */
   margin-top: 20px;
-  /* Optional: Add some spacing */
 }
 
 table {
@@ -54,11 +47,8 @@ td {
 
 .cellInput {
   width: 50px;
-  /* Adjust for individual cell width */
   height: 50px;
-  /* Adjust for individual cell height */
   font-size: 30px;
-  /* Adjust font size */
   text-align: center;
   padding: 0;
   border: 1px solid #ccc;

@@ -1,4 +1,4 @@
-import './Sudoku.css'; // Optional: if you have specific styles for Sudoku
+import './Sudoku.css';
 import { useState, useEffect } from 'react';
 
 async function generateNewSudoku() {

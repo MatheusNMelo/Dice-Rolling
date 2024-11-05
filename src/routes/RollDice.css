@@ -26,27 +26,19 @@
 
 .Die {
   width: 100px;
-  /* Set width for the die */
   height: 100px;
-  /* Set height for the die */
   border: 2px solid #333;
-  /* Border for the die */
   border-radius: 10px;
-  /* Rounded corners */
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  /* Font size for the numbers */
   margin: 10px;
-  /* Margin between dice */
   transition: transform 0.5s;
-  /* Smooth transition for rolling effect */
 }
 
 .Die-rolling {
   animation: roll 1s infinite;
-  /* Rolling animation */
 }
 
 @keyframes roll {
@@ -77,7 +69,6 @@
 
 .button:hover {
   background-color: #e0c200;
-  /* Slightly darker on hover */
 }
 
 .input-container {

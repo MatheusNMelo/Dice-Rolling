@@ -3,9 +3,24 @@ const cors = require('cors');
 const pythonBridge = require('python-bridge');
 const python = pythonBridge();
 const axios = require('axios');
+const mongoose = require('mongoose');
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+mongoose.connect('mongodb://localhost:27017/games', { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
+const gameSchema = new mongoose.Schema({
+  pulse: String,
+  generatedNumber: String,
+  gameName: String,
+  gameResult: String,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Game = mongoose.model('Game', gameSchema);
 
 let currentSeed = null;
 let prng = null;
@@ -15,8 +30,7 @@ app.use(cors());
 async function fetchSeed() {
   try {
     const response = await axios.get('https://beacon.nist.gov/beacon/2.0/pulse/last');
-    let hexHash = response.data.pulse.outputValue;
-    currentSeed = hexHash
+    currentSeed = response.data.pulse.outputValue;
   } catch (error) {
     console.error('Error fetching seed:', error);
   }
@@ -55,14 +69,13 @@ async function fetchRoutine() {
   await fetchSeed();
   prng = new XorshiftPRNG(currentSeed);
 }
+
 setInterval(fetchRoutine, 60 * 1000);
-
 fetchRoutine();
-
 
 app.get('/generate-sudoku', async (req, res) => {
   try {
-    const seeded = prng.generate()
+    const seeded = prng.generate();
     await python.ex`
       import json
       from sudoku import Sudoku
@@ -78,6 +91,15 @@ app.get('/generate-sudoku', async (req, res) => {
 
     const sudokuJson = await python`generate_sudoku(${seeded})`;
     const sudoku = JSON.parse(sudokuJson);
+
+    const gameResult = new Game({
+      pulse: currentSeed,
+      generatedNumber: seeded,
+      gameName: 'Sudoku',
+      gameResult: 'Generated Sudoku Board'
+    });
+    await gameResult.save();
+
     res.json(sudoku);
   } catch (error) {
     console.error('Error generating Sudoku:', error);
@@ -87,8 +109,17 @@ app.get('/generate-sudoku', async (req, res) => {
 
 app.get('/flip-coin', async (req, res) => {
   try {
-    const seeded = prng.generate()
-    const coin = Number(BigInt('0x' + seeded) % 2n)
+    const seeded = prng.generate();
+    const coin = Number(BigInt('0x' + seeded) % 2n);
+
+    const gameResult = new Game({
+      pulse: currentSeed,
+      generatedNumber: seeded,
+      gameName: 'Coin Flip',
+      gameResult: coin ? 'Heads' : 'Tails'
+    });
+    await gameResult.save();
+
     res.json(coin);
   } catch (error) {
     console.error('Error flipping coin:', error);
@@ -98,10 +129,8 @@ app.get('/flip-coin', async (req, res) => {
 
 app.get('/roll-dice', async (req, res) => {
   try {
-    // Extract the number of dice and type from query parameters
     const { numberOfDice, type } = req.query;
 
-    // Validate input
     if (!numberOfDice || !type) {
       return res.status(400).send('Please provide both numberOfDice and type parameters.');
     }
@@ -111,20 +140,25 @@ app.get('/roll-dice', async (req, res) => {
       return res.status(400).send('numberOfDice must be a positive integer.');
     }
 
-    // Determine the maximum value based on the dice type
-    const diceType = parseInt(type.substring(1), 10); // Extract the number from 'dX'
+    const diceType = parseInt(type.substring(1), 10);
     if (isNaN(diceType) || diceType <= 0) {
       return res.status(400).send('Invalid dice type. Please use d4, d6, etc.');
     }
 
-    // Roll the dice
     const rolls = [];
     for (let i = 0; i < numDice; i++) {
-      const roll = (prng.generate() % BigInt(diceType)) + 1n; // Generate a random number between 1 and diceType
-      rolls.push(roll.toString()); // Convert BigInt to string for response
+      const roll = (prng.generate() % BigInt(diceType)) + 1n;
+      rolls.push(roll.toString());
     }
 
-    // Send the results
+    const gameResult = new Game({
+      pulse: currentSeed,
+      generatedNumber: rolls.map(roll => prng.generate()).join(', '),
+      gameName: `Rolling ${numDice}d${diceType}`,
+      gameResult: `Rolled: ${rolls.join(', ')}`
+    });
+    await gameResult.save();
+
     res.json({ rolls });
   } catch (error) {
     console.error('Error rolling dice:', error);
