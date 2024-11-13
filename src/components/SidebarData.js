@@ -13,25 +13,31 @@ export const SidebarData = [
   {
     title: "Sudoku",
     path: "/sudoku",
-    icon: <FaIcons.FaPuzzlePiece />, // Changed icon for Sudoku
+    icon: <FaIcons.FaPuzzlePiece />,
     cName: "nav-text",
   },
   {
     title: "Coin",
     path: "/coin",
-    icon: <IoIcons.IoIosCash />, // Changed icon for Coin
+    icon: <IoIcons.IoIosCash />,
     cName: "nav-text",
   },
   {
     title: "Dices",
     path: "/rolldice",
-    icon: <FaIcons.FaDiceD20 />, // Changed icon for Dices
+    icon: <FaIcons.FaDiceD20 />,
     cName: "nav-text",
   },
   {
     title: "RPS",
     path: "/rockpaperscissors",
-    icon: <FaIcons.FaHandRock />, // Changed icon for RPS
+    icon: <FaIcons.FaHandRock />,
+    cName: "nav-text",
+  },
+  {
+    title: "Stats",
+    path: "/stats",
+    icon: <FaIcons.FaHandRock />,
     cName: "nav-text",
   },
 ];

@@ -1,8 +1,6 @@
 import './Sudoku.css';
 import { useState, useEffect } from 'react';
 import Alert from '@mui/material/Alert';
-import CheckIcon from '@mui/icons-material/Check';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 async function generateNewSudoku() {
   const response = await fetch('http://localhost:5000/generate-sudoku');

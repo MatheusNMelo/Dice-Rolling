@@ -185,7 +185,7 @@ app.get('/rock-paper-scissors', async (req, res) => {
 
 app.get('/sudoku-stats', async (req, res) => {
   try {
-    const [rows] = await pool.execute('SELECT * FROM game_results WHERE game_name = ?', ['Sudoku']);
+    const [rows] = await pool.execute('SELECT game_name, game_result,created_at FROM game_results WHERE game_name = ?', ['Sudoku']);
     // Process data as needed
     res.json(rows);
   } catch (error) {
@@ -196,8 +196,7 @@ app.get('/sudoku-stats', async (req, res) => {
 
 app.get('/rps-stats', async (req, res) => {
   try {
-    const [rows] = await pool.execute('SELECT * FROM game_results WHERE game_name = ?', ['RPS']);
-    // Process data as needed
+    const [rows] = await pool.execute('SELECT game_name, game_result,created_at FROM game_results WHERE game_name = ?', ['RPS']);
     res.json(rows);
   } catch (error) {
     console.error('Error fetching Sudoku stats:', error);
@@ -207,8 +206,7 @@ app.get('/rps-stats', async (req, res) => {
 
 app.get('/dice-stats', async (req, res) => {
   try {
-    const [rows] = await pool.execute('SELECT * FROM game_results WHERE game_name = ?', ['Dices']);
-    // Process data as needed
+    const [rows] = await pool.execute('SELECT game_name, game_result,created_at FROM game_results WHERE game_name = ?', ['Dices']);
     res.json(rows);
   } catch (error) {
     console.error('Error fetching Sudoku stats:', error);
@@ -218,8 +216,7 @@ app.get('/dice-stats', async (req, res) => {
 
 app.get('/coin-stats', async (req, res) => {
   try {
-    const [rows] = await pool.execute('SELECT * FROM game_results WHERE game_name = ?', ['Coins']);
-    // Process data as needed
+    const [rows] = await pool.execute('SELECT game_name, game_result,created_at FROM game_results WHERE game_name = ?', ['Coins']);
     res.json(rows);
   } catch (error) {
     console.error('Error fetching Sudoku stats:', error);

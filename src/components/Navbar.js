@@ -10,6 +10,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { SidebarData } from './SidebarData';
 import { Link } from 'react-router-dom';
+import logo from './logo.png';
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
@@ -23,9 +24,9 @@ export default function TemporaryDrawer() {
       <List>
         {SidebarData.map((item, index) => (
           <ListItem key={index} disablePadding>
-            <ListItemButton component={Link} to={item.path}> {/* Use Link here */}
+            <ListItemButton component={Link} to={item.path}>
               <ListItemIcon>
-                {item.icon} {/* Use the icon from SidebarData */}
+                {item.icon}
               </ListItemIcon>
               <ListItemText primary={item.title} />
             </ListItemButton>
@@ -38,7 +39,9 @@ export default function TemporaryDrawer() {
 
   return (
     <div>
-      <Button onClick={toggleDrawer(true)}>Open drawer</Button>
+      <Button onClick={toggleDrawer(true)}>
+        <img src={logo} alt="Logo" style={{ height: '50px', width: 'auto' }} />
+      </Button>
       <Drawer open={open} onClose={toggleDrawer(false)}>
         {DrawerList}
       </Drawer>
