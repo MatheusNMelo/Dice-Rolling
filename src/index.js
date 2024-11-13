@@ -3,10 +3,7 @@ import { createRoot } from "react-dom/client";
 import {
   createBrowserRouter,
   RouterProvider,
-  Route,
-  Link,
   Outlet,
-  createRoutesFromElements,
 } from "react-router-dom";
 import Home from "./routes/Home";
 import Navbar from "./components/Navbar";

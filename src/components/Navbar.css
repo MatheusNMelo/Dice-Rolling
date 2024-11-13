@@ -7,25 +7,13 @@
   font-family: "Lato", sans-serif;
 }
 
-.home,
-.reports,
-.products {
-  display: flex;
-  height: 90vh;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  background-color: #000;
-  color: #fff;
-}
-
-/* Navbar CSS */
 .navbar {
   background-color: #ffffff;
   height: 80px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  padding: 0 20px;
 }
 
 .menu-bars {
@@ -74,12 +62,19 @@
 }
 
 .nav-text a:hover {
-  background-color: #000000;
+  background-color: #BF22A5;
   color: #fff;
 }
 
 .nav-menu-items {
   width: 100%;
+}
+
+.logo {
+  height: 60px;
+  /* Adjust height as needed */
+  margin-left: 20px;
+  /* Adjust margin as needed */
 }
 
 .navbar-toggle {
@@ -89,6 +84,7 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  cursor: pointer;
 }
 
 span {

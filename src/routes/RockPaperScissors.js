@@ -15,6 +15,9 @@ const ThrowHand = () => {
   const [rock, setRock] = useState(0);
   const [paper, setPaper] = useState(0);
   const [scissors, setScissors] = useState(0);
+  const [wins, setWins] = useState(0);
+  const [losses, setLosses] = useState(0);
+  const [ties, setTies] = useState(0);
   const [outcome, setOutcome] = useState('');
 
   const onClickThrow = async () => {
@@ -22,20 +25,21 @@ const ThrowHand = () => {
       const throwResult = await throwHand();
       setResultHand(throwResult);
 
-      // Compare user hand with result hand
       if (throwResult === userHand) {
         setOutcome('It\'s a tie!');
+        setTies(prev => prev + 1);
       } else if (
         (userHand === 'rock' && throwResult === 'scissors') ||
         (userHand === 'paper' && throwResult === 'rock') ||
         (userHand === 'scissors' && throwResult === 'paper')
       ) {
         setOutcome('You win!');
+        setWins(prev => prev + 1);
       } else {
         setOutcome('You lose!');
+        setLosses(prev => prev + 1);
       }
 
-      // Update counts based on the result
       if (throwResult === 'rock') {
         setRock(prev => prev + 1);
       } else if (throwResult === 'paper') {
@@ -57,13 +61,12 @@ const ThrowHand = () => {
     setOutcome('');
   };
 
+  const images = {
+    rock: 'https://static.thenounproject.com/png/477918-512.png',
+    paper: 'https://static.thenounproject.com/png/477912-512.png',
+    scissors: 'https://static.thenounproject.com/png/477919-512.png',
+  };
   const total = rock + paper + scissors;
-  const imageElement = resultHand === 'rock'
-    ? 'https://assets.ccbp.in/frontend/react-js/rock-img.png'
-    : resultHand === 'paper'
-      ? 'https://assets.ccbp.in/frontend/react-js/paper-img.png'
-      : 'https://assets.ccbp.in/frontend/react-js/scissors-img.png';
-
   return (
     <div className="bg-container">
       <div className="app-container">
@@ -77,20 +80,31 @@ const ThrowHand = () => {
         <button className="button" type="button" onClick={onClickThrow} disabled={!userHand}>
           Throw hand
         </button>
+        {userHand && (
+          <div className="user-hand-result">
+            <h2 className="result-heading">Your Hand:</h2>
+            <img src={images[userHand]} className="image" alt="Users choice" />
+          </div>
+        )}
         {resultHand && (
           <div className="result-container">
-            <h2 className="result-heading">Result:</h2>
+            <h2 className="result-heading">Beacon:</h2>
             <div className="result-hand">
-              <img src={imageElement} className="image" alt="hand result" />
+              <img src={images[resultHand]} className="image" alt="Beacon result" />
             </div>
-            <p>{outcome}</p>
+            <h1>{outcome}</h1>
           </div>
         )}
         <div className="count-container">
-          <p className="count">{`Total: ${total}`}</p>
           <p className="count">{`Rock: ${rock}`}</p>
           <p className="count">{`Paper: ${paper}`}</p>
           <p className="count">{`Scissors: ${scissors}`}</p>
+        </div>
+        <div className="count-container">
+          <p className="count">{`Losses: ${losses}`}</p>
+          <p className="count">{`Wins: ${wins}`}</p>
+          <p className="count">{`Ties: ${ties}`}</p>
+          <p className="count">{`Total: ${total}`}</p>
         </div>
         <button className="button" type="button" onClick={resetCounts}>
           Reset

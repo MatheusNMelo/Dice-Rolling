@@ -1,5 +1,8 @@
 import './Sudoku.css';
 import { useState, useEffect } from 'react';
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 async function generateNewSudoku() {
   const response = await fetch('http://localhost:5000/generate-sudoku');
@@ -13,6 +16,7 @@ function Sudoku() {
   const [sudokuArr, setSudokuArr] = useState([]);
   const [initial, setInitial] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [alert, setAlert] = useState({ message: '', severity: '', show: false });
 
   useEffect(() => {
     const fetchSudoku = async () => {
@@ -65,12 +69,13 @@ function Sudoku() {
     let sudoku = getDeepCopy(initial);
     solver(sudoku);
     let compare = compareSudokus(sudokuArr, sudoku);
+
     if (compare.isComplete) {
-      alert("Completed!");
+      setAlert({ message: 'Sudoku Completed!', severity: 'success', show: true });
     } else if (compare.isSolvable) {
-      alert("Partially Correct!");
+      setAlert({ message: 'Partially Correct!', severity: 'info', show: true });
     } else {
-      alert("Incorrect!");
+      setAlert({ message: 'Incorrect, Try again!', severity: 'error', show: true });
     }
   }
 
@@ -177,6 +182,11 @@ function Sudoku() {
             <button className="checkButton" onClick={checkSudoku}>Check</button>
             <button className="solveButton" onClick={solveSudoku}>Solve</button>
             <button className="resetButton" onClick={resetSudoku}>Reset</button>
+            {alert.show && (
+              <Alert severity={alert.severity} onClose={() => setAlert({ ...alert, show: false })}>
+                {alert.message}
+              </Alert>
+            )}
           </div>
         </div>
       )}

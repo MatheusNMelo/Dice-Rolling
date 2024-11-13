@@ -1,26 +1,22 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const pythonBridge = require('python-bridge');
 const python = pythonBridge();
 const axios = require('axios');
-const mongoose = require('mongoose');
+const mysql = require('mysql2/promise');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-mongoose.connect('mongodb://localhost:27017/games', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+const dbConfig = {
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+};
 
-const gameSchema = new mongoose.Schema({
-  pulse: String,
-  generatedNumber: String,
-  gameName: String,
-  gameResult: String,
-  createdAt: { type: Date, default: Date.now }
-});
-
-const Game = mongoose.model('Game', gameSchema);
+const pool = mysql.createPool(dbConfig);
 
 let currentSeed = null;
 let prng = null;
@@ -92,13 +88,10 @@ app.get('/generate-sudoku', async (req, res) => {
     const sudokuJson = await python`generate_sudoku(${seeded})`;
     const sudoku = JSON.parse(sudokuJson);
 
-    const gameResult = new Game({
-      pulse: currentSeed,
-      generatedNumber: seeded,
-      gameName: 'Sudoku',
-      gameResult: 'Generated Sudoku Board'
-    });
-    await gameResult.save();
+    await pool.execute(
+      'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
+      [currentSeed, seeded, 'Sudoku', 'Generated Sudoku Board']
+    );
 
     res.json(sudoku);
   } catch (error) {
@@ -112,13 +105,10 @@ app.get('/flip-coin', async (req, res) => {
     const seeded = prng.generate();
     const coin = Number(BigInt('0x' + seeded) % 2n);
 
-    const gameResult = new Game({
-      pulse: currentSeed,
-      generatedNumber: seeded,
-      gameName: 'Coin Flip',
-      gameResult: coin ? 'Heads' : 'Tails'
-    });
-    await gameResult.save();
+    await pool.execute(
+      'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
+      [currentSeed, seeded, 'Coins', coin ? 'Heads' : 'Tails']
+    );
 
     res.json(coin);
   } catch (error) {
@@ -146,18 +136,18 @@ app.get('/roll-dice', async (req, res) => {
     }
 
     const rolls = [];
+    const outputs = [];
     for (let i = 0; i < numDice; i++) {
-      const roll = (prng.generate() % BigInt(diceType)) + 1n;
+      const output = prng.generate()
+      const roll = (output % BigInt(diceType)) + 1n;
       rolls.push(roll.toString());
+      outputs.push(output.toString());
     }
 
-    const gameResult = new Game({
-      pulse: currentSeed,
-      generatedNumber: rolls.map(roll => prng.generate()).join(', '),
-      gameName: `Rolling ${numDice}d${diceType}`,
-      gameResult: `Rolled: ${rolls.join(', ')}`
-    });
-    await gameResult.save();
+    await pool.execute(
+      'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
+      [currentSeed, outputs.join(', '), `Dices`, `Rolling ${numDice}d${diceType}, Rolled: ${rolls.join(', ')}`]
+    );
 
     res.json({ rolls });
   } catch (error) {
@@ -166,6 +156,84 @@ app.get('/roll-dice', async (req, res) => {
   }
 });
 
+app.get('/rock-paper-scissors', async (req, res) => {
+  try {
+    const seeded = prng.generate();
+    const RPS = Number(BigInt('0x' + seeded) % 3n);
+    let result = "";
+
+    if (RPS === 0) {
+      result = "rock";
+    } else if (RPS === 1) {
+      result = "paper";
+    } else {
+      result = "scissors";
+    }
+
+    await pool.execute(
+      'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
+      [currentSeed, seeded, 'RPS', result]
+    );
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error throwing hand:', error);
+    res.status(500).send('Error throwing hand');
+  }
+});
+
+
+app.get('/sudoku-stats', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM game_results WHERE game_name = ?', ['Sudoku']);
+    // Process data as needed
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching Sudoku stats:', error);
+    res.status(500).send('Error fetching Sudoku stats');
+  }
+});
+
+app.get('/rps-stats', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM game_results WHERE game_name = ?', ['RPS']);
+    // Process data as needed
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching Sudoku stats:', error);
+    res.status(500).send('Error fetching Sudoku stats');
+  }
+});
+
+app.get('/dice-stats', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM game_results WHERE game_name = ?', ['Dices']);
+    // Process data as needed
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching Sudoku stats:', error);
+    res.status(500).send('Error fetching Sudoku stats');
+  }
+});
+
+app.get('/coin-stats', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM game_results WHERE game_name = ?', ['Coins']);
+    // Process data as needed
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching Sudoku stats:', error);
+    res.status(500).send('Error fetching Sudoku stats');
+  }
+});
+
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
+});
+
+process.on('SIGINT', async () => {
+  await pool.end();
+  console.log('MySQL connection closed');
+  process.exit(0);
 });
