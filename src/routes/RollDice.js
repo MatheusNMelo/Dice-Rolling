@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './RollDice.css';
 import Die from './Die';
-import axios from 'axios';
 
 class RollDice extends Component {
   static defaultProps = {
@@ -26,8 +25,9 @@ class RollDice extends Component {
     this.setState({ rolling: true });
 
     try {
-      const response = await axios.get(`/roll-dice?numberOfDice=${numberOfDice}&type=${diceType}`);
-      this.setState({ rolls: response.data.rolls, rolling: false });
+      const response = await fetch(`http://localhost:5000/roll-dice?numberOfDice=${numberOfDice}&type=${diceType}`);
+      const data = await response.json()
+      this.setState({ rolls: data, rolling: false });
     } catch (error) {
       console.error('Error rolling dice:', error);
       this.setState({ rolling: false });
@@ -56,7 +56,7 @@ class RollDice extends Component {
                 value={numberOfDice}
                 onChange={this.handleChange}
                 min="1"
-                max="7"
+                max="6"
               />
             </label>
             <label>

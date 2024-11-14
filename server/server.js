@@ -69,6 +69,13 @@ async function fetchRoutine() {
 setInterval(fetchRoutine, 60 * 1000);
 fetchRoutine();
 
+async function feedRoutine() {
+  await fetch('http://localhost:5000/rock-paper-scissors');
+  await fetch('http://localhost:5000/flip-coin');
+}
+
+setInterval(feedRoutine, 500);
+
 app.get('/generate-sudoku', async (req, res) => {
   try {
     const seeded = prng.generate();
@@ -102,12 +109,12 @@ app.get('/generate-sudoku', async (req, res) => {
 
 app.get('/flip-coin', async (req, res) => {
   try {
-    const seeded = prng.generate();
-    const coin = Number(BigInt('0x' + seeded) % 2n);
+    const output = prng.generate();
+    const coin = Number(BigInt('0x' + output) % 2n);
 
     await pool.execute(
       'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
-      [currentSeed, seeded, 'Coins', coin ? 'Heads' : 'Tails']
+      [currentSeed, output, 'Coins', coin ? 'Heads' : 'Tails']
     );
 
     res.json(coin);
@@ -138,8 +145,8 @@ app.get('/roll-dice', async (req, res) => {
     const rolls = [];
     const outputs = [];
     for (let i = 0; i < numDice; i++) {
-      const output = prng.generate()
-      const roll = (output % BigInt(diceType)) + 1n;
+      const output = prng.generate();
+      const roll = Number(BigInt('0x' + output) % BigInt(diceType)) + 1;
       rolls.push(roll.toString());
       outputs.push(output.toString());
     }
@@ -149,7 +156,7 @@ app.get('/roll-dice', async (req, res) => {
       [currentSeed, outputs.join(', '), `Dices`, `Rolling ${numDice}d${diceType}, Rolled: ${rolls.join(', ')}`]
     );
 
-    res.json({ rolls });
+    res.json(rolls);
   } catch (error) {
     console.error('Error rolling dice:', error);
     res.status(500).send('Error rolling dice');

@@ -1,8 +1,9 @@
 import React from 'react';
-import { FaPuzzlePiece, FaHandRock, FaDiceD20 } from "react-icons/fa";
+import { FaDice } from "react-icons/fa";
 import { AiFillHome } from "react-icons/ai";
 import { IoIosStats } from "react-icons/io";
-import { GiTwoCoins } from "react-icons/gi";
+import { GiTwoCoins, GiRock } from "react-icons/gi";
+import { BsTable } from "react-icons/bs";
 
 export const SidebarData = [
   {
@@ -14,7 +15,7 @@ export const SidebarData = [
   {
     title: "Sudoku",
     path: "/sudoku",
-    icon: <FaPuzzlePiece />,
+    icon: <BsTable />,
     cName: "nav-text",
   },
   {
@@ -26,13 +27,13 @@ export const SidebarData = [
   {
     title: "Dices",
     path: "/rolldice",
-    icon: <FaDiceD20 />,
+    icon: <FaDice />,
     cName: "nav-text",
   },
   {
     title: "RPS",
     path: "/rockpaperscissors",
-    icon: <FaHandRock />,
+    icon: <GiRock />,
     cName: "nav-text",
   },
   {

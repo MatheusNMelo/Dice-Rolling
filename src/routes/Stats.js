@@ -64,7 +64,7 @@ export default function Stats() {
   return (
     <div className="bg-container">
       <div className="app-container">
-        <Typography variant="h4" align="center" gutterBottom>Game Statistics</Typography>
+        <h1 className="heading">Games Statistics</h1>
         <Divider sx={{ backgroundColor: "black", marginBottom: 2 }} />
         <FormControl sx={{ width: '150px' }} margin="normal">
           <InputLabel id="game-select-label">Select Game</InputLabel>
