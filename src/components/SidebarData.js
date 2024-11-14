@@ -1,43 +1,44 @@
 import React from 'react';
-import * as FaIcons from "react-icons/fa";
-import * as AiIcons from "react-icons/ai";
-import * as IoIcons from "react-icons/io";
+import { FaPuzzlePiece, FaHandRock, FaDiceD20 } from "react-icons/fa";
+import { AiFillHome } from "react-icons/ai";
+import { IoIosStats } from "react-icons/io";
+import { GiTwoCoins } from "react-icons/gi";
 
 export const SidebarData = [
   {
     title: "Home",
     path: "/",
-    icon: <AiIcons.AiFillHome />,
+    icon: <AiFillHome />,
     cName: "nav-text",
   },
   {
     title: "Sudoku",
     path: "/sudoku",
-    icon: <FaIcons.FaPuzzlePiece />,
+    icon: <FaPuzzlePiece />,
     cName: "nav-text",
   },
   {
     title: "Coin",
     path: "/coin",
-    icon: <IoIcons.IoIosCash />,
+    icon: <GiTwoCoins />,
     cName: "nav-text",
   },
   {
     title: "Dices",
     path: "/rolldice",
-    icon: <FaIcons.FaDiceD20 />,
+    icon: <FaDiceD20 />,
     cName: "nav-text",
   },
   {
     title: "RPS",
     path: "/rockpaperscissors",
-    icon: <FaIcons.FaHandRock />,
+    icon: <FaHandRock />,
     cName: "nav-text",
   },
   {
     title: "Stats",
     path: "/stats",
-    icon: <FaIcons.FaHandRock />,
+    icon: <IoIosStats />,
     cName: "nav-text",
   },
 ];

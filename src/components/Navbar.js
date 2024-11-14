@@ -40,7 +40,7 @@ export default function TemporaryDrawer() {
   return (
     <div>
       <Button onClick={toggleDrawer(true)}>
-        <img src={logo} alt="Logo" style={{ height: '50px', width: 'auto' }} />
+        <img src={logo} alt="Logo" style={{ height: '100px', width: 'auto' }} />
       </Button>
       <Drawer open={open} onClose={toggleDrawer(false)}>
         {DrawerList}

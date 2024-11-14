@@ -2,6 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import { PieChart } from '@mui/x-charts/PieChart';
 import CircularProgress from '@mui/material/CircularProgress';
+import axios from 'axios';
 
 export default function PieAnimation() {
   const [data, setData] = React.useState([]);
@@ -11,7 +12,8 @@ export default function PieAnimation() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/rps-stats');
+        const { game } = this.state;
+        const response = await axios.get(`/roll-dice?numberOfDice=${game}`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

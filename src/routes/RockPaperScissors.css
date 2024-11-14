@@ -2,8 +2,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #282c34;
+  background-image: linear-gradient(to right, #111111, rgb(51, 51, 51));
   min-height: 90vh;
+
 }
 
 .app-container {
@@ -15,6 +16,10 @@
   padding: 30px;
   min-width: 50%;
   min-height: 500px;
+  border-radius: 20px;
+  -webkit-box-shadow: 10px 10px 48px 5px rgba(0, 0, 0, 0.48);
+  -moz-box-shadow: 10px 10px 48px 5px rgba(0, 0, 0, 0.48);
+  box-shadow: 10px 10px 48px 5px rgba(0, 0, 0, 0.48);
 }
 
 .image {
@@ -27,9 +32,14 @@
   min-width: 50%;
 }
 
+.hand-selection {
+  display: flex;
+  gap: 20px;
+}
+
 .button {
-  color: #a35200;
-  background-color: #f9d423;
+  color: black;
+  background-color: #C4AFF0;
   min-width: 80px;
   min-height: 25px;
   border-radius: 8px;
@@ -37,7 +47,14 @@
   cursor: pointer;
 }
 
-/* Hand flip animations */
+.button:focus {
+  outline: 0;
+}
+
+.button:hover {
+  background-color: #957cca;
+}
+
 .result-hand {
   position: relative;
   width: 100px;

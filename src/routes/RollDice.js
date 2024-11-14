@@ -4,7 +4,6 @@ import Die from './Die';
 import axios from 'axios';
 
 class RollDice extends Component {
-  // Default props for dice sides
   static defaultProps = {
     sides: ['one', 'two', 'three', 'four', 'five', 'six']
   };
@@ -12,12 +11,11 @@ class RollDice extends Component {
   constructor(props) {
     super(props);
 
-    // State
     this.state = {
       rolls: [],
       rolling: false,
-      numberOfDice: 2, // Default to rolling 2 dice
-      diceType: 'd6' // Default to d6
+      numberOfDice: 2,
+      diceType: 'd6'
     };
     this.roll = this.roll.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -28,7 +26,6 @@ class RollDice extends Component {
     this.setState({ rolling: true });
 
     try {
-      // Make API call to roll dice
       const response = await axios.get(`/roll-dice?numberOfDice=${numberOfDice}&type=${diceType}`);
       this.setState({ rolls: response.data.rolls, rolling: false });
     } catch (error) {

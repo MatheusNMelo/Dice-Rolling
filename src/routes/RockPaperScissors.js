@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './RockPaperScissors.css';
+import Divider from '@mui/material/Divider';
 
 async function throwHand() {
   const response = await fetch('http://localhost:5000/rock-paper-scissors');
@@ -71,6 +72,7 @@ const ThrowHand = () => {
     <div className="bg-container">
       <div className="app-container">
         <h1 className="heading">Rock Paper Scissors</h1>
+        <Divider sx={{ backgroundColor: "black" }} />
         <p className="desc">Choose your hand!</p>
         <div className="hand-selection">
           <button className="button" onClick={() => setUserHand('rock')}>Rock</button>

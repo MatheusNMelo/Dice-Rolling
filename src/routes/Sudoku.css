@@ -1,6 +1,6 @@
 body {
   font-family: 'Roboto', sans-serif;
-  background-color: #282c34;
+  background-image: linear-gradient(to right, #111111, rgb(51, 51, 51));
   margin: 0;
 }
 
@@ -12,7 +12,7 @@ body {
 }
 
 .App-header {
-  background-color: #282c34;
+  /* background-color: #282c34; */
   height: auto;
   display: flex;
   flex-direction: column;
@@ -84,11 +84,11 @@ button:hover {
 }
 
 .solveButton {
-  background-color: orange;
+  background-color: #957cca;
 }
 
 .solveButton:hover {
-  background-color: darkorange;
+  background-color: #957cca;
 }
 
 .checkButton {
