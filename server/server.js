@@ -184,15 +184,20 @@ app.get('/rock-paper-scissors', async (req, res) => {
 
 
 app.get('/game-stats', async (req, res) => {
-  try {
-    const { game } = req.query;
-    const [rows] = await pool.execute('SELECT game_name, game_result,created_at FROM game_results WHERE game_name = ?', [game]);
-    // Process data as needed
-    res.json(rows);
-  } catch (error) {
-    console.error('Error fetching Sudoku stats:', error);
-    res.status(500).send('Error fetching Sudoku stats');
+  const { game } = req.query;
+
+  if (!game || !['Sudoku', 'RPS', 'Dices', 'Coins'].includes(game)) {
+    return res.status(400).send('Invalid game specified.');
   }
+
+  const [rows] = await pool.execute('SELECT game_name, game_result, created_at FROM game_results WHERE game_name = ?', [game]);
+
+  res.json(rows);
+});
+
+app.get('/get-pulse', async (req, res) => {
+
+  res.json({ currentSeed });
 });
 
 app.listen(port, () => {

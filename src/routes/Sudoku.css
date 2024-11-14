@@ -8,11 +8,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 90vh;
+  height: 70vh;
 }
 
 .App-header {
-  /* background-color: #282c34; */
   height: auto;
   display: flex;
   flex-direction: column;
@@ -34,6 +33,7 @@ body {
 }
 
 table {
+  margin-top: 5px;
   border-collapse: collapse;
   border: 3px solid bisque;
   background-color: bisque;
@@ -67,7 +67,7 @@ td {
 }
 
 .buttonContainer {
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 button {
@@ -88,7 +88,7 @@ button:hover {
 }
 
 .solveButton:hover {
-  background-color: #957cca;
+  background-color: #48356e;
 }
 
 .checkButton {
@@ -125,9 +125,4 @@ button:hover {
 
 tr:hover {
   background-color: rgba(0, 0, 0, 0.05);
-}
-
-button:focus {
-  outline: 2px solid #007BFF;
-  outline-offset: 2px;
 }

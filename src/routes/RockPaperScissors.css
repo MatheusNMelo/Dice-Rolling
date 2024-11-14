@@ -3,8 +3,7 @@
   justify-content: center;
   align-items: center;
   background-image: linear-gradient(to right, #111111, rgb(51, 51, 51));
-  min-height: 90vh;
-
+  min-height: 70vh;
 }
 
 .app-container {
@@ -15,6 +14,7 @@
   align-items: center;
   padding: 30px;
   min-width: 50%;
+  max-width: 800px;
   min-height: 500px;
   border-radius: 20px;
   -webkit-box-shadow: 10px 10px 48px 5px rgba(0, 0, 0, 0.48);
@@ -58,9 +58,7 @@
 .result-hand {
   position: relative;
   width: 100px;
-  /* Set the width of the result hand */
   height: 100px;
-  /* Set the height of the result hand */
 }
 
 .result-hand.rock {

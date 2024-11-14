@@ -11,6 +11,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { SidebarData } from './SidebarData';
 import { Link } from 'react-router-dom';
 import logo from './logo.png';
+import logo2 from './logo2.png';
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
@@ -21,6 +22,7 @@ export default function TemporaryDrawer() {
 
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
+      <img src={logo2} alt="Logo" style={{ height: '85px', width: 'auto' }} />
       <List>
         {SidebarData.map((item, index) => (
           <ListItem key={index} disablePadding>
@@ -33,13 +35,13 @@ export default function TemporaryDrawer() {
           </ListItem>
         ))}
       </List>
-      <Divider />
+      <Divider></Divider>
     </Box>
   );
 
   return (
     <div>
-      <Button onClick={toggleDrawer(true)}>
+      <Button className='LogoButton' onClick={toggleDrawer(true)}>
         <img src={logo} alt="Logo" style={{ height: '100px', width: 'auto' }} />
       </Button>
       <Drawer open={open} onClose={toggleDrawer(false)}>

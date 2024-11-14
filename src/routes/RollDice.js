@@ -44,42 +44,46 @@ class RollDice extends Component {
     const { rolls, rolling, numberOfDice, diceType } = this.state;
 
     return (
-      <div className='RollDice'>
-        <div className='RollDice-container'>
+      <div className="bg-container">
+        <div className="app-container">
+          <h1 className="heading">Dices</h1>
+          <div>
+            <label>
+              Number of Dice:
+              <input
+                type="number"
+                name="numberOfDice"
+                value={numberOfDice}
+                onChange={this.handleChange}
+                min="1"
+                max="7"
+              />
+            </label>
+            <label>
+              Type of Dice:
+              <select
+                name="diceType"
+                value={diceType}
+                onChange={this.handleChange}
+              >
+                <option value="d4">d4</option>
+                <option value="d6">d6</option>
+                <option value="d8">d8</option>
+                <option value="d10">d10</option>
+                <option value="d12">d12</option>
+                <option value="d20">d20</option>
+              </select>
+            </label>
+          </div>
+          <div>
+            <button className={handleBtn} disabled={rolling} onClick={this.roll}>
+              {rolling ? 'Rolling' : 'Roll Dice!'}
+            </button>
+          </div>
           {rolls.map((roll, index) => (
             <Die key={index} face={this.props.sides[parseInt(roll) - 1]} rolling={rolling} />
           ))}
         </div>
-        <div>
-          <label>
-            Number of Dice:
-            <input
-              type="number"
-              name="numberOfDice"
-              value={numberOfDice}
-              onChange={this.handleChange}
-              min="1"
-            />
-          </label>
-          <label>
-            Type of Dice:
-            <select
-              name="diceType"
-              value={diceType}
-              onChange={this.handleChange}
-            >
-              <option value="d4">d4</option>
-              <option value="d6">d6</option>
-              <option value="d8">d8</option>
-              <option value="d10">d10</option>
-              <option value="d12">d12</option>
-              <option value="d20">d20</option>
-            </select>
-          </label>
-        </div>
-        <button className={handleBtn} disabled={rolling} onClick={this.roll}>
-          {rolling ? 'Rolling' : 'Roll Dice!'}
-        </button>
       </div>
     );
   }
