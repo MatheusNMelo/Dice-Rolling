@@ -32,38 +32,51 @@ async function fetchSeed() {
   }
 }
 
-class XorshiftPRNG {
-  constructor(seedHex) {
-    this.state = this.hexToUint64Array(seedHex);
-  }
+class MersenneTwister {
+  constructor(seed) {
+    this.index = 624;
+    this.mt = new Array(624);
+    this.mt[0] = seed >>> 0;
 
-  hexToUint64Array(hex) {
-    const uint64Array = [];
-    for (let i = 0; i < hex.length; i += 16) {
-      const chunk = hex.slice(i, i + 16);
-      uint64Array.push(BigInt('0x' + chunk));
+    for (let i = 1; i < 624; i++) {
+      this.mt[i] = (1812433253 * (this.mt[i - 1] ^ (this.mt[i - 1] >>> 30)) + i) >>> 0;
     }
-    return uint64Array;
   }
 
-  xorshift() {
-    let t = this.state[0] ^ (this.state[0] << 13n);
-    this.state[0] = this.state[1];
-    this.state[1] = this.state[2];
-    this.state[2] = this.state[3];
-    this.state[3] = this.state[3] ^ (this.state[3] >> 9n) ^ (t ^ (t >> 6n));
-    return this.state[3];
+  next() {
+    if (this.index >= 624) {
+      this.generateNumbers();
+    }
+
+    let y = this.mt[this.index++];
+    y ^= (y >>> 11);
+    y ^= (y << 7) & 2636928640; // 0x9d2c5680
+    y ^= (y << 15) & 4022730752; // 0xefc60000
+    y ^= (y >>> 18);
+
+    return y >>> 0; // Return a 32-bit integer
+  }
+
+  generateNumbers() {
+    for (let i = 0; i < 624; i++) {
+      let y = (this.mt[i] & 0x80000000) | (this.mt[(i + 1) % 624] & 0x7fffffff);
+      this.mt[i] = this.mt[(i + 397) % 624] ^ (y >>> 1);
+      if (y % 2 !== 0) {
+        this.mt[i] ^= 2567483615; // 0x9908b0df
+      }
+    }
+    this.index = 0;
   }
 
   generate() {
-    const randomValue = this.xorshift();
+    const randomValue = this.next();
     return randomValue.toString(16).padStart(16, '0');
   }
 }
 
 async function fetchRoutine() {
   await fetchSeed();
-  prng = new XorshiftPRNG(currentSeed);
+  prng = new MersenneTwister(currentSeed);
 }
 
 setInterval(fetchRoutine, 60 * 1000);
@@ -73,8 +86,6 @@ async function feedRoutine() {
   await fetch('http://localhost:5000/rock-paper-scissors');
   await fetch('http://localhost:5000/flip-coin');
 }
-
-setInterval(feedRoutine, 500);
 
 app.get('/generate-sudoku', async (req, res) => {
   try {
@@ -139,7 +150,7 @@ app.get('/roll-dice', async (req, res) => {
 
     const diceType = parseInt(type.substring(1), 10);
     if (isNaN(diceType) || diceType <= 0) {
-      return res.status(400).send('Invalid dice type. Please use d4, d6, etc.');
+      return res.status(400).send('Invalid dice ty pe. Please use d4, d6, etc.');
     }
 
     const rolls = [];
@@ -147,14 +158,13 @@ app.get('/roll-dice', async (req, res) => {
     for (let i = 0; i < numDice; i++) {
       const output = prng.generate();
       const roll = Number(BigInt('0x' + output) % BigInt(diceType)) + 1;
+      await pool.execute(
+        'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
+        [currentSeed, output, `Dices-d${diceType}`, `${roll}`]
+      );
       rolls.push(roll.toString());
       outputs.push(output.toString());
     }
-
-    await pool.execute(
-      'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
-      [currentSeed, outputs.join(', '), `Dices`, `Rolling ${numDice}d${diceType}, Rolled: ${rolls.join(', ')}`]
-    );
 
     res.json(rolls);
   } catch (error) {
@@ -191,11 +201,7 @@ app.get('/rock-paper-scissors', async (req, res) => {
 
 
 app.get('/game-stats', async (req, res) => {
-  const { game } = req.query;
-
-  if (!game || !['Sudoku', 'RPS', 'Dices', 'Coins'].includes(game)) {
-    return res.status(400).send('Invalid game specified.');
-  }
+  let { game } = req.query;
 
   const [rows] = await pool.execute('SELECT game_name, game_result, created_at FROM game_results WHERE game_name = ?', [game]);
 

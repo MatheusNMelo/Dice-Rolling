@@ -18,13 +18,12 @@
   cursor: pointer;
 }
 
-
 #coin.heads {
   animation: flipHeads 1s ease-out forwards;
 }
 
 #coin.tails {
-  animation: flipTails 1s ease-out forwards;
+  animation: flipTails 1s ease-out backwards;
 }
 
 #coin {

@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import './RollDice.css';
-import Die from './Die';
 
 class RollDice extends Component {
   static defaultProps = {
-    sides: ['one', 'two', 'three', 'four', 'five', 'six']
+    sides: ['I', 'II', 'III', 'IV', 'V', 'VI',
+      'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII',
+      'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX'
+    ]
   };
 
   constructor(props) {
@@ -14,7 +16,9 @@ class RollDice extends Component {
       rolls: [],
       rolling: false,
       numberOfDice: 2,
-      diceType: 'd6'
+      diceType: 'd6',
+      error: null,
+      sum: 0
     };
     this.roll = this.roll.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -22,15 +26,18 @@ class RollDice extends Component {
 
   async roll() {
     const { numberOfDice, diceType } = this.state;
-    this.setState({ rolling: true });
+    this.setState({ rolling: true, error: null, sum: 0 });
 
     try {
       const response = await fetch(`http://localhost:5000/roll-dice?numberOfDice=${numberOfDice}&type=${diceType}`);
-      const data = await response.json()
-      this.setState({ rolls: data, rolling: false });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      this.setState({ rolls: data, rolling: false, sum: data.reduce((total, roll) => total + parseInt(roll), 0) });
     } catch (error) {
       console.error('Error rolling dice:', error);
-      this.setState({ rolling: false });
+      this.setState({ rolling: false, error: 'Failed to roll dice. Please try again.' });
     }
   }
 
@@ -40,8 +47,7 @@ class RollDice extends Component {
   }
 
   render() {
-    const handleBtn = this.state.rolling ? 'RollDice-rolling' : '';
-    const { rolls, rolling, numberOfDice, diceType } = this.state;
+    const { rolls, rolling, numberOfDice, diceType, error, sum } = this.state;
 
     return (
       <div className="bg-container">
@@ -76,13 +82,22 @@ class RollDice extends Component {
             </label>
           </div>
           <div>
-            <button className={handleBtn} disabled={rolling} onClick={this.roll}>
+            <button onClick={this.roll}>
               {rolling ? 'Rolling' : 'Roll Dice!'}
             </button>
           </div>
-          {rolls.map((roll, index) => (
-            <Die key={index} face={this.props.sides[parseInt(roll) - 1]} rolling={rolling} />
-          ))}
+          {error && <p className="error">{error}</p>}
+          <div className="RollDice-container">
+            {rolls.map((roll, index) => {
+              const rollIndex = parseInt(roll) - 1;
+              return (
+                <div key={index} className='Die'>
+                  {this.props.sides[rollIndex]}
+                </div>
+              );
+            })}
+          </div>
+          <p>Sum: {sum}</p>
         </div>
       </div>
     );

@@ -57,6 +57,9 @@ const ThrowHand = () => {
     setRock(0);
     setPaper(0);
     setScissors(0);
+    setWins(0);
+    setLosses(0);
+    setTies(0);
     setUserHand('');
     setResultHand('');
     setOutcome('');
@@ -82,21 +85,21 @@ const ThrowHand = () => {
         <button className="button" type="button" onClick={onClickThrow} disabled={!userHand}>
           Throw hand
         </button>
-        {userHand && (
-          <div className="user-hand-result">
-            <h2 className="result-heading">Your Hand:</h2>
-            <img src={images[userHand]} className="image" alt="Users choice" />
-          </div>
-        )}
-        {resultHand && (
-          <div className="result-container">
-            <h2 className="result-heading">Beacon:</h2>
-            <div className="result-hand">
+        <div className="result-hand-container">
+          {resultHand && (
+            <div className="user-hand-result">
+              <h2 className="result-heading">Your Hand:</h2>
+              <img src={images[userHand]} className="image" alt="Users choice" />
+            </div>
+          )}
+          {resultHand && (
+            <div className="beacon-hand-result">
+              <h2 className="result-heading">Beacon:</h2>
               <img src={images[resultHand]} className="image" alt="Beacon result" />
             </div>
-            <h1>{outcome}</h1>
-          </div>
-        )}
+          )}
+        </div>
+        <h1>{outcome}</h1>
         <div className="count-container">
           <p className="count">{`Rock: ${rock}`}</p>
           <p className="count">{`Paper: ${paper}`}</p>

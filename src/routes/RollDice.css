@@ -9,6 +9,11 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.heading {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
 .RollDice-container {
   display: flex;
   justify-content: center;
@@ -17,8 +22,8 @@
 }
 
 .Die {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border: 2px solid #333;
   border-radius: 10px;
   display: flex;
@@ -35,15 +40,23 @@
 
 @keyframes roll {
   0% {
-    transform: rotate(0);
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(90deg);
   }
 
   50% {
-    transform: rotate(360deg);
+    transform: rotate(180deg);
+  }
+
+  75% {
+    transform: rotate(270deg);
   }
 
   100% {
-    transform: rotate(0);
+    transform: rotate(360deg);
   }
 }
 
@@ -89,5 +102,4 @@ select:focus,
 input[type="number"]:focus {
   outline: none;
   border-color: black;
-  /* Border color on focus */
 }
