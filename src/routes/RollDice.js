@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import './RollDice.css';
 
 class RollDice extends Component {
@@ -34,7 +35,12 @@ class RollDice extends Component {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      this.setState({ rolls: data, rolling: false, sum: data.reduce((total, roll) => total + parseInt(roll), 0) });
+      this.setState({ rolls: data, sum: data.reduce((total, roll) => total + parseInt(roll), 0) });
+
+      // Adiciona um atraso antes de definir rolling como false
+      setTimeout(() => {
+        this.setState({ rolling: false });
+      }, 2000); // 2 segundos de atraso
     } catch (error) {
       console.error('Error rolling dice:', error);
       this.setState({ rolling: false, error: 'Failed to roll dice. Please try again.' });
@@ -82,8 +88,8 @@ class RollDice extends Component {
             </label>
           </div>
           <div>
-            <button onClick={this.roll}>
-              {rolling ? 'Rolling' : 'Roll Dice!'}
+            <button className="button" type="button" onClick={this.roll} disabled={rolling}>
+              {rolling ? 'Rolling...' : 'Roll Dice!'}
             </button>
           </div>
           {error && <p className="error">{error}</p>}
@@ -91,7 +97,7 @@ class RollDice extends Component {
             {rolls.map((roll, index) => {
               const rollIndex = parseInt(roll) - 1;
               return (
-                <div key={index} className='Die'>
+                <div key={index} className={`Die ${rolling ? 'Die-rolling' : ''}`}>
                   {this.props.sides[rollIndex]}
                 </div>
               );
@@ -103,5 +109,9 @@ class RollDice extends Component {
     );
   }
 }
+
+RollDice.propTypes = {
+  sides: PropTypes.arrayOf(PropTypes.string)
+};
 
 export default RollDice;

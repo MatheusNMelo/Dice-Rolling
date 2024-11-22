@@ -30,21 +30,30 @@ function Home() {
   return (
     <div className="bg-container">
       <div className="app-container">
-        <Typography variant="h4" gutterBottom color="textPrimary">Welcome to the Beacon Dice Project</Typography>
+        <Typography variant="h4" gutterBottom color="textPrimary">
+          Welcome to the Beacon Dice Project
+        </Typography>
 
         {loading && <CircularProgress color="primary" />}
         {error && <Typography variant="h6" color="error">{error.message}</Typography>}
 
         {pulse !== null && (
-          <>
+          <div>
             <Typography variant="h6" gutterBottom color="textPrimary">
-              This application aims to retrieve, treat and use data from a given Randomness Beacon pulse to use as a source for randomness in different games.<br />
-              The current Randomness Beacon being used is the <strong>NIST Randomness Beacon</strong> and the current pulse value is:<br /><br />
-              <strong>pulse</strong>.<br /><br />
-              Clicking on the logo in the top-left will reveal a navbar containing the different available games that will use this pulse as
-              a source for their truly random generation. <br /><strong>Enjoy!</strong>
+              This application aims to retrieve, treat and use data from a given Randomness Beacon pulse to use as a source for randomness in different games.
+              The current Randomness Beacon being used is the <strong>NIST Randomness Beacon</strong> and the current pulse value is:
             </Typography>
-          </>
+            <Typography variant="h6" fontSize="0.6rem" gutterBottom color="textPrimary">
+              <strong>{pulse}</strong>
+            </Typography>
+            <Typography variant="h6" gutterBottom color="textPrimary">
+              Clicking on the logo in the top-left will reveal a navbar containing the different available games that will use this pulse as
+              a source for their truly random generation.
+            </Typography>
+            <Typography variant="h6" gutterBottom color="textPrimary" align="center">
+              <strong>Enjoy!</strong>
+            </Typography>
+          </div>
         )}
       </div>
     </div>

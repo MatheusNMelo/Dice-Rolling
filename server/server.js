@@ -50,11 +50,11 @@ class MersenneTwister {
 
     let y = this.mt[this.index++];
     y ^= (y >>> 11);
-    y ^= (y << 7) & 2636928640; // 0x9d2c5680
-    y ^= (y << 15) & 4022730752; // 0xefc60000
+    y ^= (y << 7) & 2636928640;
+    y ^= (y << 15) & 4022730752;
     y ^= (y >>> 18);
 
-    return y >>> 0; // Return a 32-bit integer
+    return y >>> 0;
   }
 
   generateNumbers() {
@@ -62,15 +62,14 @@ class MersenneTwister {
       let y = (this.mt[i] & 0x80000000) | (this.mt[(i + 1) % 624] & 0x7fffffff);
       this.mt[i] = this.mt[(i + 397) % 624] ^ (y >>> 1);
       if (y % 2 !== 0) {
-        this.mt[i] ^= 2567483615; // 0x9908b0df
+        this.mt[i] ^= 2567483615;
       }
     }
     this.index = 0;
   }
 
   generate() {
-    const randomValue = this.next();
-    return randomValue.toString(16).padStart(16, '0');
+    return this.next();
   }
 }
 
@@ -81,11 +80,6 @@ async function fetchRoutine() {
 
 setInterval(fetchRoutine, 60 * 1000);
 fetchRoutine();
-
-async function feedRoutine() {
-  await fetch('http://localhost:5000/rock-paper-scissors');
-  await fetch('http://localhost:5000/flip-coin');
-}
 
 app.get('/generate-sudoku', async (req, res) => {
   try {
@@ -150,11 +144,10 @@ app.get('/roll-dice', async (req, res) => {
 
     const diceType = parseInt(type.substring(1), 10);
     if (isNaN(diceType) || diceType <= 0) {
-      return res.status(400).send('Invalid dice ty pe. Please use d4, d6, etc.');
+      return res.status(400).send('Invalid dice type. Please use d4, d6, etc.');
     }
 
     const rolls = [];
-    const outputs = [];
     for (let i = 0; i < numDice; i++) {
       const output = prng.generate();
       const roll = Number(BigInt('0x' + output) % BigInt(diceType)) + 1;
@@ -163,7 +156,6 @@ app.get('/roll-dice', async (req, res) => {
         [currentSeed, output, `Dices-d${diceType}`, `${roll}`]
       );
       rolls.push(roll.toString());
-      outputs.push(output.toString());
     }
 
     res.json(rolls);
@@ -177,39 +169,32 @@ app.get('/rock-paper-scissors', async (req, res) => {
   try {
     const seeded = prng.generate();
     const RPS = Number(BigInt('0x' + seeded) % 3n);
-    let result = "";
-
-    if (RPS === 0) {
-      result = "rock";
-    } else if (RPS === 1) {
-      result = "paper";
-    } else {
-      result = "scissors";
-    }
+    const result = RPS === 0 ? "rock" : RPS === 1 ? "paper" : "scissors";
 
     await pool.execute(
       'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
       [currentSeed, seeded, 'RPS', result]
     );
 
-    res.json(result);
+    res.json({ result });
   } catch (error) {
-    console.error('Error throwing hand:', error);
-    res.status(500).send('Error throwing hand');
+    console.error('Error playing rock-paper-scissors:', error);
+    res.status(500).send('Error playing rock-paper-scissors');
   }
 });
 
-
 app.get('/game-stats', async (req, res) => {
-  let { game } = req.query;
-
-  const [rows] = await pool.execute('SELECT game_name, game_result, created_at FROM game_results WHERE game_name = ?', [game]);
-
-  res.json(rows);
+  try {
+    const { game } = req.query;
+    const [rows] = await pool.execute('SELECT game_name, game_result, created_at FROM game_results WHERE game_name = ?', [game]);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching game stats:', error);
+    res.status(500).send('Error fetching game stats');
+  }
 });
 
-app.get('/get-pulse', async (req, res) => {
-
+app.get('/get-pulse', (req, res) => {
   res.json({ currentSeed });
 });
 
@@ -219,6 +204,5 @@ app.listen(port, () => {
 
 process.on('SIGINT', async () => {
   await pool.end();
-  console.log('MySQL connection closed');
   process.exit(0);
 });
