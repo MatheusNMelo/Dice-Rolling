@@ -15,10 +15,43 @@ import logo2 from './logo2.png';
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
+  const [timeLeft, setTimeLeft] = React.useState(60);
+  const [iteration, setIteration] = React.useState(null);
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
+
+  const fetchPulse = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get-pulse');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setIteration(data.iteration);
+    } catch (error) {
+      console.error('Error fetching pulse:', error);
+    }
+  };
+
+  React.useEffect(() => {
+    const updateTimer = () => {
+      const now = new Date();
+      const seconds = now.getSeconds();
+      const timeToNextMinute = 60 - seconds;
+      setTimeLeft(timeToNextMinute);
+    };
+
+    updateTimer();
+    const timerInterval = setInterval(updateTimer, 100);
+    const pulseInterval = setInterval(fetchPulse, 100);
+
+    return () => {
+      clearInterval(timerInterval);
+      clearInterval(pulseInterval);
+    };
+  }, []);
 
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
@@ -35,7 +68,7 @@ export default function TemporaryDrawer() {
           </ListItem>
         ))}
       </List>
-      <Divider></Divider>
+      <Divider />
     </Box>
   );
 
@@ -47,6 +80,9 @@ export default function TemporaryDrawer() {
       <Drawer open={open} onClose={toggleDrawer(false)}>
         {DrawerList}
       </Drawer>
+      <div style={{ textAlign: 'center', marginTop: '20px', color: 'lightgrey', position: 'absolute', top: '10px', width: '100%' }}>
+        <h2>Current pulse has {iteration} interations, New pulse in: {timeLeft} seconds</h2>
+      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import './RockPaperScissors.css';
 
 function Home() {
   const [pulse, setPulse] = useState(null);
+  const [beacon, setBeacon] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,6 +18,7 @@ function Home() {
         }
         const data = await response.json();
         setPulse(data.currentSeed);
+        setBeacon(data.beacon);
       } catch (error) {
         setError(error);
       } finally {
@@ -41,7 +43,7 @@ function Home() {
           <div>
             <Typography variant="h6" gutterBottom color="textPrimary">
               This application aims to retrieve, treat and use data from a given Randomness Beacon pulse to use as a source for randomness in different games.
-              The current Randomness Beacon being used is the <strong>NIST Randomness Beacon</strong> and the current pulse value is:
+              The current Randomness Beacon being used is the <strong>{beacon} Randomness Beacon</strong> and the current pulse value is:
             </Typography>
             <Typography variant="h6" fontSize="0.6rem" gutterBottom color="textPrimary">
               <strong>{pulse}</strong>

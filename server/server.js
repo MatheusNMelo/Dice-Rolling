@@ -3,8 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const pythonBridge = require('python-bridge');
 const python = pythonBridge();
-const axios = require('axios');
 const mysql = require('mysql2/promise');
+const readline = require('readline');
+const schedule = require('node-schedule');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -20,17 +21,10 @@ const pool = mysql.createPool(dbConfig);
 
 let currentSeed = null;
 let prng = null;
-
+let beaconUrl = '';
+let beacon = "";
+let iteration = 0;
 app.use(cors());
-
-async function fetchSeed() {
-  try {
-    const response = await axios.get('https://beacon.nist.gov/beacon/2.0/pulse/last');
-    currentSeed = response.data.pulse.outputValue;
-  } catch (error) {
-    console.error('Error fetching seed:', error);
-  }
-}
 
 class MersenneTwister {
   constructor(seed) {
@@ -73,17 +67,75 @@ class MersenneTwister {
   }
 }
 
-async function fetchRoutine() {
-  await fetchSeed();
-  prng = new MersenneTwister(currentSeed);
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+async function chooseBeacon() {
+  return new Promise((resolve) => {
+    rl.question('Choose Beacon (1 - NIST, 2 - Local): ', (answer) => {
+      if (answer === '1') {
+        beaconUrl = 'https://beacon.nist.gov/beacon/2.0/pulse/last';
+        console.log('NIST Beacon Selected');
+        beacon = "NIST";
+      } else if (answer === '2') {
+        beaconUrl = 'http://192.168.217.147:8080/public/latest';
+        console.log('Local Beacon Selected');
+        beacon = "Local";
+      } else {
+        console.log('Invalid, defaulting to NIST Beacon');
+        beaconUrl = 'https://beacon.nist.gov/beacon/2.0/pulse/last';
+        beacon = "NIST";
+      }
+      rl.close();
+      resolve();
+    });
+  });
 }
 
-setInterval(fetchRoutine, 60 * 1000);
-fetchRoutine();
+async function fetchSeed() {
+  try {
+    const response = await fetch(beaconUrl);
+    let data = await response.json();
+    currentSeed = beaconUrl.includes('nist') ?
+      data.pulse.outputValue :
+      data.randomness;
+    prng = new MersenneTwister(currentSeed);
+    iteration = 0;
+  } catch (error) {
+    console.error('Error fetching seed:', error);
+  }
+}
+
+async function feedGameResults() {
+  await fetch('http://localhost:5000/rock-paper-scissors');
+  await fetch('http://localhost:5000/flip-coin');
+  await fetch('http://localhost:5000/roll-dice?type=d6&numberOfDice=3');
+  await fetch('http://localhost:5000/roll-dice?type=d4&numberOfDice=3');
+  await fetch('http://localhost:5000/roll-dice?type=d8&numberOfDice=3');
+  await fetch('http://localhost:5000/roll-dice?type=d10&numberOfDice=3');
+  await fetch('http://localhost:5000/roll-dice?type=d12&numberOfDice=3');
+  await fetch('http://localhost:5000/roll-dice?type=d20&numberOfDice=3');
+}
+
+if (require.main === module) {
+  (async () => {
+    await chooseBeacon();
+    await fetchSeed();
+    schedule.scheduleJob('0 * * * * *', fetchSeed);
+
+    setInterval(feedGameResults, 500)
+    app.listen(port, () => {
+      console.log(`Server port is http://localhost:${port}`);
+    });
+  })();
+}
 
 app.get('/generate-sudoku', async (req, res) => {
   try {
     const seeded = prng.generate();
+    iteration++;
     await python.ex`
       import json
       from sudoku import Sudoku
@@ -101,8 +153,8 @@ app.get('/generate-sudoku', async (req, res) => {
     const sudoku = JSON.parse(sudokuJson);
 
     await pool.execute(
-      'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
-      [currentSeed, seeded, 'Sudoku', 'Generated Sudoku Board']
+      'INSERT INTO game_results (beacon,pulse, generated_number, game_name, game_result, iteration) VALUES (?, ?, ?, ?, ?, ?)',
+      [beacon, currentSeed, seeded, 'Sudoku', 'Generated Sudoku Board', iteration]
     );
 
     res.json(sudoku);
@@ -115,11 +167,12 @@ app.get('/generate-sudoku', async (req, res) => {
 app.get('/flip-coin', async (req, res) => {
   try {
     const output = prng.generate();
+    iteration++;
     const coin = Number(BigInt('0x' + output) % 2n);
 
     await pool.execute(
-      'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
-      [currentSeed, output, 'Coins', coin ? 'Heads' : 'Tails']
+      'INSERT INTO game_results (beacon,pulse, generated_number, game_name, game_result, iteration) VALUES (?, ?, ?, ?, ?,?)',
+      [beacon, currentSeed, output, 'Coins', coin ? 'Heads' : 'Tails', iteration]
     );
 
     res.json(coin);
@@ -132,28 +185,17 @@ app.get('/flip-coin', async (req, res) => {
 app.get('/roll-dice', async (req, res) => {
   try {
     const { numberOfDice, type } = req.query;
-
-    if (!numberOfDice || !type) {
-      return res.status(400).send('Please provide both numberOfDice and type parameters.');
-    }
-
     const numDice = parseInt(numberOfDice, 10);
-    if (isNaN(numDice) || numDice <= 0) {
-      return res.status(400).send('numberOfDice must be a positive integer.');
-    }
-
     const diceType = parseInt(type.substring(1), 10);
-    if (isNaN(diceType) || diceType <= 0) {
-      return res.status(400).send('Invalid dice type. Please use d4, d6, etc.');
-    }
 
     const rolls = [];
     for (let i = 0; i < numDice; i++) {
       const output = prng.generate();
+      iteration++;
       const roll = Number(BigInt('0x' + output) % BigInt(diceType)) + 1;
       await pool.execute(
-        'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
-        [currentSeed, output, `Dices-d${diceType}`, `${roll}`]
+        'INSERT INTO game_results (beacon,pulse, generated_number, game_name, game_result, iteration) VALUES (?, ?, ?, ?, ?, ?)',
+        [beacon, currentSeed, output, `Dices-d${diceType}`, `${roll}`, iteration]
       );
       rolls.push(roll.toString());
     }
@@ -168,12 +210,13 @@ app.get('/roll-dice', async (req, res) => {
 app.get('/rock-paper-scissors', async (req, res) => {
   try {
     const seeded = prng.generate();
+    iteration++;
     const RPS = Number(BigInt('0x' + seeded) % 3n);
     const result = RPS === 0 ? "rock" : RPS === 1 ? "paper" : "scissors";
 
     await pool.execute(
-      'INSERT INTO game_results (pulse, generated_number, game_name, game_result) VALUES (?, ?, ?, ?)',
-      [currentSeed, seeded, 'RPS', result]
+      'INSERT INTO game_results (beacon, pulse, generated_number, game_name, game_result, iteration) VALUES (?, ?, ?, ?, ?, ?)',
+      [beacon, currentSeed, seeded, 'RPS', result, iteration]
     );
 
     res.json({ result });
@@ -195,11 +238,7 @@ app.get('/game-stats', async (req, res) => {
 });
 
 app.get('/get-pulse', (req, res) => {
-  res.json({ currentSeed });
-});
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  res.json({ currentSeed, beacon, iteration });
 });
 
 process.on('SIGINT', async () => {

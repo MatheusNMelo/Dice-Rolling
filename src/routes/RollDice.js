@@ -37,10 +37,9 @@ class RollDice extends Component {
       const data = await response.json();
       this.setState({ rolls: data, sum: data.reduce((total, roll) => total + parseInt(roll), 0) });
 
-      // Adiciona um atraso antes de definir rolling como false
       setTimeout(() => {
         this.setState({ rolling: false });
-      }, 2000); // 2 segundos de atraso
+      }, 1000);
     } catch (error) {
       console.error('Error rolling dice:', error);
       this.setState({ rolling: false, error: 'Failed to roll dice. Please try again.' });

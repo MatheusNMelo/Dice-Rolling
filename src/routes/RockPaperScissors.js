@@ -24,15 +24,15 @@ const ThrowHand = () => {
   const onClickThrow = async () => {
     try {
       const throwResult = await throwHand();
-      setResultHand(throwResult);
+      setResultHand(throwResult.result);
 
-      if (throwResult === userHand) {
+      if (throwResult.result === userHand) {
         setOutcome('It\'s a tie!');
         setTies(prev => prev + 1);
       } else if (
-        (userHand === 'rock' && throwResult === 'scissors') ||
-        (userHand === 'paper' && throwResult === 'rock') ||
-        (userHand === 'scissors' && throwResult === 'paper')
+        (userHand === 'rock' && throwResult.result === 'scissors') ||
+        (userHand === 'paper' && throwResult.result === 'rock') ||
+        (userHand === 'scissors' && throwResult.result === 'paper')
       ) {
         setOutcome('You win!');
         setWins(prev => prev + 1);
@@ -41,9 +41,9 @@ const ThrowHand = () => {
         setLosses(prev => prev + 1);
       }
 
-      if (throwResult === 'rock') {
+      if (throwResult.result === 'rock') {
         setRock(prev => prev + 1);
-      } else if (throwResult === 'paper') {
+      } else if (throwResult.result === 'paper') {
         setPaper(prev => prev + 1);
       } else {
         setScissors(prev => prev + 1);
