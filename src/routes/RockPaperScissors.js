@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import './RockPaperScissors.css';
 import Divider from '@mui/material/Divider';
 
+export const images = {
+  rock: 'https://static.thenounproject.com/png/477918-512.png',
+  paper: 'https://static.thenounproject.com/png/477912-512.png',
+  scissors: 'https://static.thenounproject.com/png/477919-512.png',
+};
+
 async function throwHand() {
   const response = await fetch('http://localhost:5000/rock-paper-scissors');
   if (!response.ok) {
@@ -65,11 +71,7 @@ const ThrowHand = () => {
     setOutcome('');
   };
 
-  const images = {
-    rock: 'https://static.thenounproject.com/png/477918-512.png',
-    paper: 'https://static.thenounproject.com/png/477912-512.png',
-    scissors: 'https://static.thenounproject.com/png/477919-512.png',
-  };
+
   const total = rock + paper + scissors;
   return (
     <div className="bg-container">

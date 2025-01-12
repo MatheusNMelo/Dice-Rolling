@@ -1,0 +1,22 @@
+.reels {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.reel {
+  font-size: 50px;
+  margin: 0 10px;
+  transition: transform 0.5s;
+}
+
+.reel-spinning {
+  transform: rotate(360deg);
+}
+
+
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

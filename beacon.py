@@ -8,19 +8,26 @@ import time
 from typing import Any, Dict
 
 import aiohttp
+import mysql.connector
 import schedule
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
+db_config = {
+    "user": "matheus",
+    "password": "7355608",
+    "host": "localhost",
+    "database": "beacon",
+}
+
 
 class EnhancedRandomnessBeacon:
     def __init__(self):
         self.last_value = None
-        self.round = 0
         self.latest_generation = None
 
     async def _fetch_beacon_data(self):
@@ -45,7 +52,7 @@ class EnhancedRandomnessBeacon:
             os.urandom(32),
             str(time.time_ns()).encode(),
             str(os.cpu_count()).encode(),
-            os.urandom(16),  # Entropia adicional
+            os.urandom(16),
             nist_entropy or b"",
             drand_entropy or b"",
         ]
@@ -56,7 +63,6 @@ class EnhancedRandomnessBeacon:
 
     def generate(self) -> Dict[str, Any]:
 
-        # Usa asyncio para buscar beacons
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         entropy = loop.run_until_complete(self._gather_entropy())
@@ -71,21 +77,68 @@ class EnhancedRandomnessBeacon:
             ]
         )
 
-        # Duplo hash com SHA3-512
         hash1 = hashlib.sha3_512(message).digest()
         new_value = hashlib.sha3_512(hash1).hexdigest()
 
         self.last_value = new_value
-        self.round += 1
 
         result = {
-            "round": self.round,
             "randomness": new_value,
             "timestamp": timestamp,
             "previous": self.last_value,
         }
 
-        self.latest_generation = result
+        self.latest_generation = latest()
+
+        self.save_to_db(result)
+        return result
+
+    def latest(self):
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT * FROM beacon_results ORDER BY id DESC LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return result
+
+    def save_to_db(self, result: Dict[str, Any]):
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        query = (
+            "INSERT INTO beacon_results "
+            "(randomness, timestamp, previous) "
+            "VALUES (, %s, %s, %s)"
+        )
+        data = (
+            result["randomness"],
+            result["timestamp"],
+            result["previous"],
+        )
+        cursor.execute(query, data)
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    def get_pulse_by_timestamp(self, timestamp: int) -> Dict[str, Any]:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT * FROM beacon_results WHERE timestamp = %s"
+        cursor.execute(query, (timestamp,))
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return result
+
+    def get_pulse_by_id(self, id: int) -> Dict[str, Any]:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT * FROM beacon_results WHERE id = %s"
+        cursor.execute(query, (id,))
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
         return result
 
 
@@ -101,6 +154,39 @@ def latest():
     return jsonify(beacon.latest_generation or beacon.generate())
 
 
+@app.route("/public/pulse")
+def get_pulse():
+    timestamp = request.args.get("timestamp")
+    id = request.args.get("id")
+
+    if timestamp:
+        try:
+            timestamp = int(timestamp)
+        except ValueError:
+            return jsonify({"error": "Invalid timestamp format"}), 400
+
+        result = beacon.get_pulse_by_timestamp(timestamp)
+        if result:
+            return jsonify(result)
+        else:
+            return jsonify({"error": "Pulse not found"}), 404
+
+    elif id:
+        try:
+            id = int(id)
+        except ValueError:
+            return jsonify({"error": "Invalid id format"}), 400
+
+        result = beacon.get_pulse_by_id(id)
+        if result:
+            return jsonify(result)
+        else:
+            return jsonify({"error": "Pulse not found"}), 404
+
+    else:
+        return jsonify({"error": "Timestamp or id is required"}), 400
+
+
 def run_schedule():
     while True:
         schedule.run_pending()
@@ -108,7 +194,6 @@ def run_schedule():
 
 
 if __name__ == "__main__":
-
     schedule.every().minute.at(":00").do(scheduled_generation)
 
     scheduler_thread = threading.Thread(target=run_schedule, daemon=True)

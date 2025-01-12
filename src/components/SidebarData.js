@@ -37,6 +37,12 @@ export const SidebarData = [
     cName: "nav-text",
   },
   {
+    title: "Slots",
+    path: "/slots",
+    icon: <GiRock />,
+    cName: "nav-text",
+  },
+  {
     title: "Stats",
     path: "/stats",
     icon: <IoIosStats />,

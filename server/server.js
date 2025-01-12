@@ -182,6 +182,28 @@ app.get('/flip-coin', async (req, res) => {
   }
 });
 
+app.get('/slots', async (req, res) => {
+  try {
+    const fruits = 3;
+    const rolls = [];
+    for (let i = 0; i < fruits; i++) {
+      const output = prng.generate();
+      iteration++;
+      const roll = Number(BigInt('0x' + output) % BigInt(fruits)) + 1;
+      await pool.execute(
+        'INSERT INTO game_results (beacon,pulse, generated_number, game_name, game_result, iteration) VALUES (?, ?, ?, ?, ?, ?)',
+        [beacon, currentSeed, output, `Slots`, `${roll}`, iteration]
+      );
+      rolls.push(roll.toString());
+    }
+
+    res.json(rolls);
+  } catch (error) {
+    console.error('Error rolling slots:', error);
+    res.status(500).send('Error rolling slots');
+  }
+});
+
 app.get('/roll-dice', async (req, res) => {
   try {
     const { numberOfDice, type } = req.query;

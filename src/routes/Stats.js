@@ -3,17 +3,15 @@ import { PieChart, BarChart } from '@mui/x-charts';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Select, MenuItem, InputLabel, FormControl, Typography, Alert, Divider } from '@mui/material';
 import './Stats.css';
-import {
-  mangoFusionPalette,
-} from '@mui/x-charts/colorPalettes';
-
+import { mangoFusionPalette } from '@mui/x-charts/colorPalettes';
+import { symbols as slotSymbols } from './Slots';
 
 export default function Stats() {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [selectedGame, setSelectedGame] = React.useState('Coins');
-  const games = ['RPS', 'Dices', 'Coins'];
+  const games = ['RPS', 'Dices', 'Coins', 'Slots'];
   const [selectedDiceType, setSelectedDiceType] = React.useState('d4');
   const diceTypes = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20'];
 
@@ -33,7 +31,6 @@ export default function Stats() {
         if (response.status !== 200) {
           throw new Error('Network response was not ok');
         }
-        let chartData = '';
         const result = await response.json();
         const aggregatedData = result.reduce((acc, item) => {
           let gameResult = item.game_result.toLowerCase();
@@ -43,10 +40,13 @@ export default function Stats() {
           acc[gameResult] = (acc[gameResult] || 0) + 1;
           return acc;
         }, {});
-        chartData = Object.entries(aggregatedData).map(([label, value]) => ({
-          label,
-          value,
-        }));
+
+        let chartData = Object.entries(aggregatedData).map(([label, value]) => {
+          if (selectedGame === 'Slots') {
+            label = slotSymbols[parseInt(label) - 1];
+          }
+          return { label, value };
+        });
 
         setData(chartData);
       } catch (error) {
@@ -71,14 +71,17 @@ export default function Stats() {
   };
 
   if (loading) {
-    <div className="loading-container">
-      return <CircularProgress variant="plain" color="neutral" />;
-    </div>
+    return (
+      <div className="loading-container">
+        <CircularProgress variant="plain" color="neutral" />
+      </div>
+    );
   }
 
   if (error) {
     return <Alert severity="error">{error}</Alert>;
   }
+
   return (
     <div className="bg-container">
       <div className="app-container">
@@ -126,18 +129,20 @@ export default function Stats() {
               height={300}
               colors={mangoFusionPalette}
             />
-          ) : (<PieChart
-            height={300}
-            colors={mangoFusionPalette}
-            series={[
-              {
-                data: data.slice(0, 4),
-                innerRadius: 80,
-                arcLabel: (params) => params.label ?? '',
-                arcLabelMinAngle: 20,
-              },
-            ]}
-          />)
+          ) : (
+            <PieChart
+              height={300}
+              colors={mangoFusionPalette}
+              series={[
+                {
+                  data: data.slice(0, 4),
+                  innerRadius: 80,
+                  arcLabel: (params) => params.label ?? '',
+                  arcLabelMinAngle: 20,
+                },
+              ]}
+            />
+          )
         ) : (
           selectedGame && <Typography variant="body1">No data available for the selected game.</Typography>
         )}

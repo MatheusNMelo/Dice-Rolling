@@ -10,6 +10,7 @@ import Navbar from "./components/Navbar";
 import Sudoku from "./routes/Sudoku";
 import Coin from "./routes/Coin";
 import RollDice from "./routes/RollDice";
+import Slots from "./routes/Slots";
 import RockPaperScissors from "./routes/RockPaperScissors";
 import Stats from "./routes/Stats";
 import "./components/Navbar.css";
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
       {
         path: "rockpaperscissors",
         element: <RockPaperScissors />,
+      },
+      {
+        path: "slots",
+        element: <Slots />,
       },
       {
         path: "stats",

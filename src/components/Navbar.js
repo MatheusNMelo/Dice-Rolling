@@ -80,8 +80,9 @@ export default function TemporaryDrawer() {
       <Drawer open={open} onClose={toggleDrawer(false)}>
         {DrawerList}
       </Drawer>
-      <div style={{ textAlign: 'center', marginTop: '20px', color: 'lightgrey', position: 'absolute', top: '10px', width: '100%' }}>
-        <h2>Current pulse has {iteration} interations, New pulse in: {timeLeft} seconds</h2>
+      <div style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: 'rgba(0, 0, 0, 0.1)', padding: '10px', borderRadius: '5px', color: 'white', textAlign: 'center' }}>
+        <h2 style={{ margin: 0 }}>Current pulse has {iteration} iterations</h2>
+        <p style={{ margin: 0 }}>New pulse in: {timeLeft} seconds</p>
       </div>
     </div>
   );
