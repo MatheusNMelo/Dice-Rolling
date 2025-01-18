@@ -9,7 +9,8 @@ const schedule = require('node-schedule');
 
 const app = express();
 const port = process.env.PORT || 5000;
-
+app.listen(port, () => {
+});
 const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -18,6 +19,27 @@ const dbConfig = {
 };
 
 const pool = mysql.createPool(dbConfig);
+async function createTableIfNotExists() {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS game_results (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      beacon VARCHAR(255) NOT NULL,
+      pulse VARCHAR(255) NOT NULL,
+      generated_number VARCHAR(255) NOT NULL,
+      game_name VARCHAR(255) NOT NULL,
+      game_result VARCHAR(255) NOT NULL,
+      iteration INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+
+  try {
+    await pool.execute(createTableQuery);
+    console.log('Table "game_results" is ready.');
+  } catch (error) {
+    console.error('Error creating table:', error);
+  }
+}
 
 let currentSeed = null;
 let prng = null;
@@ -114,10 +136,12 @@ async function feedGameResults() {
   await fetch('http://localhost:5000/roll-dice?type=d10&numberOfDice=3');
   await fetch('http://localhost:5000/roll-dice?type=d12&numberOfDice=3');
   await fetch('http://localhost:5000/roll-dice?type=d20&numberOfDice=3');
+  await fetch('http://localhost:5000/slots');
 }
 
 if (require.main === module) {
   (async () => {
+    await createTableIfNotExists();
     await chooseBeacon();
     await fetchSeed();
     schedule.scheduleJob('0 * * * * *', fetchSeed);

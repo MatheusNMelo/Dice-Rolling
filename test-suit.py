@@ -1,40 +1,51 @@
 from itertools import groupby
 
-import mysql.connector
 import numpy as np
 import pandas as pd
-from scipy.stats import binom_test, chisquare, kstest, norm
+from scipy.stats import binomtest, chisquare, kstest, norm
+from sqlalchemy import create_engine
 
-conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="7355608",
-    database="games",
-)
+# Configurar a conexão com o banco de dados usando SQLAlchemy
+engine1 = create_engine("mysql+mysqlconnector://root:7355608@localhost/games")
+engine2 = create_engine("mysql+mysqlconnector://root:7355608@192.168.217.147/beacon")
 
-conn2 = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="7355608",
-    database="beacon",
-)
-query = "SELECT * FROM beacon_results"
-df = pd.read_sql(query, conn)
-# df2 = pd.read_sql(query, conn2)
+# Executar consultas SQL e carregar os dados em DataFrames do pandas
+query1 = "SELECT * FROM nist_randomness"
+query2 = "SELECT * FROM beacon_results"
+df1 = pd.read_sql(query1, engine1)
+df2 = pd.read_sql(query2, engine2)
+
+
+# Função para converter valores hexadecimais para binário
+def hex_to_binary(hex_string):
+    return [int(bit) for bit in bin(int(hex_string, 16))[2:].zfill(len(hex_string) * 4)]
+
+
+# Converter a coluna 'randomness' de hexadecimal para binário
+random_numbers = []
+for hex_value in df2["randomness"]:
+    binary_value = hex_to_binary(hex_value)
+    random_numbers.extend(hex_to_binary(hex_value))
+
+total_hex_chars = sum(len(hex_value) for hex_value in df2["randomness"])
+expected_length = total_hex_chars * 4
+actual_length = len(random_numbers)
+
+print(f"Expected length: {expected_length}, Actual length: {actual_length}")
 
 
 # Função para o Teste de Frequência (Monobit)
 def frequency_monobit_test(numbers):
     n = len(numbers)
     s = sum(numbers)
-    p_value = binom_test(s, n, 0.5)
+    p_value = binomtest(s, n, 0.5).pvalue
     return p_value
 
 
 # Função para o Teste de Frequência em Blocos
 def frequency_block_test(numbers, block_size):
     blocks = [numbers[i : i + block_size] for i in range(0, len(numbers), block_size)]
-    p_values = [binom_test(sum(block), len(block), 0.5) for block in blocks]
+    p_values = [binomtest(sum(block), len(block), 0.5).pvalue for block in blocks]
     return p_values
 
 
@@ -59,17 +70,6 @@ def longest_runs_of_ones_test(numbers, block_size):
     return p_value
 
 
-# Função para o Teste de Rank de Matrizes Binárias
-def binary_matrix_rank_test(numbers, matrix_size):
-    matrices = [
-        np.reshape(numbers[i : i + matrix_size**2], (matrix_size, matrix_size))
-        for i in range(0, len(numbers), matrix_size**2)
-    ]
-    ranks = [np.linalg.matrix_rank(matrix) for matrix in matrices]
-    p_value = chisquare(ranks).pvalue
-    return p_value
-
-
 # Função para o Teste de Transformada Discreta de Fourier
 def discrete_fourier_transform_test(numbers):
     transformed = np.fft.fft(numbers)
@@ -86,9 +86,9 @@ def non_overlapping_template_matching_test(numbers, template):
         for i in range(len(numbers) - template_length + 1)
         if numbers[i : i + template_length] == template
     )
-    p_value = binom_test(
+    p_value = binomtest(
         matches, len(numbers) - template_length + 1, 1 / (2**template_length)
-    )
+    ).pvalue
     return p_value
 
 
@@ -100,7 +100,7 @@ def overlapping_template_matching_test(numbers, template):
         for i in range(len(numbers) - template_length + 1)
         if numbers[i : i + template_length] == template
     )
-    p_value = binom_test(matches, len(numbers), 1 / (2**template_length))
+    p_value = binomtest(matches, len(numbers), 1 / (2**template_length)).pvalue
     return p_value
 
 
@@ -216,14 +216,11 @@ def random_excursions_variant_test(numbers):
     return p_values
 
 
-random_numbers = df["random_numbers"].tolist()
 print("Frequency Monobit Test p-value:", frequency_monobit_test(random_numbers))
-print("Frequency Block Test p-values:", frequency_block_test(random_numbers, 100))
 print("Runs Test p-value:", runs_test(random_numbers))
 print(
     "Longest Runs of Ones Test p-value:", longest_runs_of_ones_test(random_numbers, 100)
 )
-print("Binary Matrix Rank Test p-value:", binary_matrix_rank_test(random_numbers, 32))
 print(
     "Discrete Fourier Transform Test p-value:",
     discrete_fourier_transform_test(random_numbers),
@@ -246,8 +243,3 @@ print(
     "Approximate Entropy Test p-value:", approximate_entropy_test(random_numbers, 100)
 )
 print("Cumulative Sums Test p-value:", cumulative_sums_test(random_numbers))
-print("Random Excursions Test p-values:", random_excursions_test(random_numbers))
-print(
-    "Random Excursions Variant Test p-values:",
-    random_excursions_variant_test(random_numbers),
-)
