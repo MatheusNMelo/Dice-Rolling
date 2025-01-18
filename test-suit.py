@@ -12,8 +12,15 @@ conn = mysql.connector.connect(
     database="games",
 )
 
+conn2 = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="7355608",
+    database="beacon",
+)
 query = "SELECT * FROM beacon_results"
 df = pd.read_sql(query, conn)
+# df2 = pd.read_sql(query, conn2)
 
 
 # Função para o Teste de Frequência (Monobit)

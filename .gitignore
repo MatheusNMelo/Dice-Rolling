@@ -12,6 +12,8 @@
 /build
 /git
 # misc
+.dockerignore
+Dockerfile
 .DS_Store
 .env.local
 .env.development.local
