@@ -77,14 +77,11 @@ async function chooseBeacon() {
     rl.question('Choose Beacon (1 - NIST, 2 - Local): ', (answer) => {
       if (answer === '1') {
         beaconUrl = 'https://beacon.nist.gov/beacon/2.0/pulse/last';
-        console.log('NIST Beacon Selected');
         beacon = "NIST";
       } else if (answer === '2') {
         beaconUrl = 'http://192.168.217.147:8080/public/latest';
-        console.log('Local Beacon Selected');
         beacon = "Local";
       } else {
-        console.log('Invalid, defaulting to NIST Beacon');
         beaconUrl = 'https://beacon.nist.gov/beacon/2.0/pulse/last';
         beacon = "NIST";
       }
@@ -126,9 +123,6 @@ if (require.main === module) {
     schedule.scheduleJob('0 * * * * *', fetchSeed);
 
     setInterval(feedGameResults, 500)
-    app.listen(port, () => {
-      console.log(`Server port is http://localhost:${port}`);
-    });
   })();
 }
 
