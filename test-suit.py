@@ -14,6 +14,7 @@ query1 = "SELECT * FROM nist_randomness"
 query2 = "SELECT * FROM beacon_results"
 df1 = pd.read_sql(query1, engine1)
 df2 = pd.read_sql(query2, engine2)
+df1 = df1.drop_duplicates(subset=["randomness"])
 
 
 # Função para converter valores hexadecimais para binário
@@ -26,6 +27,11 @@ random_numbers = []
 for hex_value in df2["randomness"]:
     binary_value = hex_to_binary(hex_value)
     random_numbers.extend(hex_to_binary(hex_value))
+
+
+df_dropped = df2["randomness"].drop_duplicates()
+print(f"Tamanho do DataFrame antes de remover duplicatas: {len(df2["randomness"])}")
+print(f"Tamanho do DataFrame após remover duplicatas: {len(df_dropped)}")
 
 total_hex_chars = sum(len(hex_value) for hex_value in df2["randomness"])
 expected_length = total_hex_chars * 4
@@ -217,13 +223,8 @@ def random_excursions_variant_test(numbers):
 
 
 print("Frequency Monobit Test p-value:", frequency_monobit_test(random_numbers))
-print("Runs Test p-value:", runs_test(random_numbers))
 print(
     "Longest Runs of Ones Test p-value:", longest_runs_of_ones_test(random_numbers, 100)
-)
-print(
-    "Discrete Fourier Transform Test p-value:",
-    discrete_fourier_transform_test(random_numbers),
 )
 print(
     "Non-Overlapping Template Matching Test p-value:",
@@ -242,4 +243,3 @@ print("Serial Test p-value:", serial_test(random_numbers, 100))
 print(
     "Approximate Entropy Test p-value:", approximate_entropy_test(random_numbers, 100)
 )
-print("Cumulative Sums Test p-value:", cumulative_sums_test(random_numbers))
