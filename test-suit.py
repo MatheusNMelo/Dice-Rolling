@@ -2,72 +2,62 @@ from itertools import groupby
 
 import numpy as np
 import pandas as pd
-from scipy.stats import binomtest, chisquare, kstest, norm
+from scipy.stats import binomtest, chisquare, norm
 from sqlalchemy import create_engine
 
 # Configurar a conexão com o banco de dados usando SQLAlchemy
-engine1 = create_engine("mysql+mysqlconnector://root:7355608@localhost/games")
-engine2 = create_engine("mysql+mysqlconnector://root:7355608@192.168.217.147/beacon")
+engine1 = create_engine("mysql+mysqlconnector://root:7355608@192.168.217.147/beacon")
 
 # Executar consultas SQL e carregar os dados em DataFrames do pandas
 query1 = "SELECT * FROM nist_randomness"
 query2 = "SELECT * FROM beacon_results"
 df1 = pd.read_sql(query1, engine1)
-df2 = pd.read_sql(query2, engine2)
-df1 = df1.drop_duplicates(subset=["randomness"])
+df2 = pd.read_sql(query2, engine1)
 
 
 # Função para converter valores hexadecimais para binário
 def hex_to_binary(hex_string):
+    """Converte uma string hexadecimal em uma lista de bits binários."""
     return [int(bit) for bit in bin(int(hex_string, 16))[2:].zfill(len(hex_string) * 4)]
 
 
-# Converter a coluna 'randomness' de hexadecimal para binário
-random_numbers = []
-for hex_value in df2["randomness"]:
-    binary_value = hex_to_binary(hex_value)
-    random_numbers.extend(hex_to_binary(hex_value))
+# Função para dividir um DataFrame em 4 partes
+def split_dataframe(df, num_parts=4):
+    """Divide um DataFrame em um número especificado de partes."""
+    return np.array_split(df, num_parts)
 
 
-df_dropped = df2["randomness"].drop_duplicates()
-print(f"Tamanho do DataFrame antes de remover duplicatas: {len(df2["randomness"])}")
-print(f"Tamanho do DataFrame após remover duplicatas: {len(df_dropped)}")
-
-total_hex_chars = sum(len(hex_value) for hex_value in df2["randomness"])
-expected_length = total_hex_chars * 4
-actual_length = len(random_numbers)
-
-print(f"Expected length: {expected_length}, Actual length: {actual_length}")
+# Função para aplicar os testes em uma lista de números
+def apply_tests(numbers):
+    """Aplica uma série de testes de aleatoriedade em uma lista de números binários."""
+    results = {}
+    results["Frequency Monobit Test"] = frequency_monobit_test(numbers)
+    results["Longest Runs of Ones Test"] = longest_runs_of_ones_test(numbers, 100)
+    results["Non-Overlapping Template Matching Test"] = (
+        non_overlapping_template_matching_test(numbers, [1, 0, 1])
+    )
+    results["Overlapping Template Matching Test"] = overlapping_template_matching_test(
+        numbers, [1, 0, 1]
+    )
+    results["Maurer's Universal Statistical Test"] = maurer_universal_test(numbers)
+    results["Linear Complexity Test"] = linear_complexity_test(numbers, 100)
+    results["Serial Test"] = serial_test(numbers, 100)
+    results["Approximate Entropy Test"] = approximate_entropy_test(numbers, 100)
+    return results
 
 
 # Função para o Teste de Frequência (Monobit)
 def frequency_monobit_test(numbers):
+    """Teste de Frequência (Monobit) para verificar a proporção de 0s e 1s."""
     n = len(numbers)
     s = sum(numbers)
     p_value = binomtest(s, n, 0.5).pvalue
     return p_value
 
 
-# Função para o Teste de Frequência em Blocos
-def frequency_block_test(numbers, block_size):
-    blocks = [numbers[i : i + block_size] for i in range(0, len(numbers), block_size)]
-    p_values = [binomtest(sum(block), len(block), 0.5).pvalue for block in blocks]
-    return p_values
-
-
-# Função para o Teste de Corridas
-def runs_test(numbers):
-    n = len(numbers)
-    runs = 1 + sum(numbers[i] != numbers[i - 1] for i in range(1, n))
-    expected_runs = (2 * n - 1) / 3
-    variance_runs = (16 * n - 29) / 90
-    z = (runs - expected_runs) / np.sqrt(variance_runs)
-    p_value = 2 * (1 - norm.cdf(abs(z)))
-    return p_value
-
-
 # Função para o Teste de Longest Runs of Ones in a Block
 def longest_runs_of_ones_test(numbers, block_size):
+    """Teste de Longest Runs of Ones em blocos de tamanho especificado."""
     blocks = [numbers[i : i + block_size] for i in range(0, len(numbers), block_size)]
     longest_runs = [
         max(len(list(g)) for k, g in groupby(block) if k == 1) for block in blocks
@@ -76,16 +66,9 @@ def longest_runs_of_ones_test(numbers, block_size):
     return p_value
 
 
-# Função para o Teste de Transformada Discreta de Fourier
-def discrete_fourier_transform_test(numbers):
-    transformed = np.fft.fft(numbers)
-    magnitudes = np.abs(transformed)
-    p_value = kstest(magnitudes, "norm").pvalue
-    return p_value
-
-
 # Função para o Teste de Template Matching Não-Overlapping
 def non_overlapping_template_matching_test(numbers, template):
+    """Teste de Template Matching Não-Overlapping."""
     template_length = len(template)
     matches = sum(
         1
@@ -100,6 +83,7 @@ def non_overlapping_template_matching_test(numbers, template):
 
 # Função para o Teste de Template Matching Overlapping
 def overlapping_template_matching_test(numbers, template):
+    """Teste de Template Matching Overlapping."""
     template_length = len(template)
     matches = sum(
         1
@@ -112,6 +96,7 @@ def overlapping_template_matching_test(numbers, template):
 
 # Função para o Teste Universal de Maurer
 def maurer_universal_test(numbers):
+    """Teste Universal de Maurer para avaliar a compressibilidade da sequência."""
     L = 7
     Q = 1280
     K = len(numbers) // L - Q
@@ -132,6 +117,7 @@ def maurer_universal_test(numbers):
 
 # Função para o Teste de Complexidade Linear
 def linear_complexity_test(numbers, block_size):
+    """Teste de Complexidade Linear usando o algoritmo de Berlekamp-Massey."""
     blocks = [numbers[i : i + block_size] for i in range(0, len(numbers), block_size)]
     complexities = [berlekamp_massey(block) for block in blocks]
     mean = (
@@ -147,7 +133,9 @@ def linear_complexity_test(numbers, block_size):
     return p_value
 
 
+# Algoritmo de Berlekamp-Massey para calcular a complexidade linear
 def berlekamp_massey(bits):
+    """Implementação do algoritmo de Berlekamp-Massey para calcular a complexidade linear."""
     n = len(bits)
     c = [0] * n
     b = [0] * n
@@ -172,6 +160,7 @@ def berlekamp_massey(bits):
 
 # Função para o Teste Serial
 def serial_test(numbers, block_size):
+    """Teste Serial para verificar a uniformidade das sequências."""
     blocks = [numbers[i : i + block_size] for i in range(0, len(numbers), block_size)]
     counts = [sum(block) for block in blocks]
     p_value = chisquare(counts).pvalue
@@ -180,6 +169,7 @@ def serial_test(numbers, block_size):
 
 # Função para o Teste de Entropia Aproximada
 def approximate_entropy_test(numbers, block_size):
+    """Teste de Entropia Aproximada para medir a complexidade da sequência."""
     blocks = [numbers[i : i + block_size] for i in range(0, len(numbers), block_size)]
     counts = [sum(block) for block in blocks]
     phi_m = sum(np.log(count / len(blocks)) for count in counts) / len(blocks)
@@ -191,55 +181,44 @@ def approximate_entropy_test(numbers, block_size):
     return p_value
 
 
-# Função para o Teste de Somas Cumulativas
-def cumulative_sums_test(numbers):
-    cumulative_sums = np.cumsum(2 * np.array(numbers) - 1)
-    p_value = kstest(cumulative_sums, "norm").pvalue
-    return p_value
+# Função para processar um DataFrame, dividir em partes e aplicar os testes
+def process_and_test_dataframe(df, df_name):
+    """Processa um DataFrame, divide em partes e aplica os testes de aleatoriedade."""
+    # Converter a coluna 'randomness' de hexadecimal para binário
+    random_numbers = []
+    for hex_value in df["randomness"]:
+        random_numbers.extend(hex_to_binary(hex_value))
+
+    # Dividir os números binários em 4 partes
+    parts = split_dataframe(pd.DataFrame(random_numbers), num_parts=4)
+
+    # Aplicar os testes em cada parte e armazenar os resultados
+    results = []
+    for i, part in enumerate(parts):
+        part_name = f"Part {i+1}"
+        part_size = len(part)
+        part_results = apply_tests(part[0].tolist())
+        part_results["Part"] = part_name
+        part_results["Size"] = part_size
+        results.append(part_results)
+
+    # Criar um DataFrame com os resultados
+    results_df = pd.DataFrame(results)
+    results_df.set_index("Part", inplace=True)
+
+    return results_df
 
 
-# Função para o Teste de Excursões Aleatórias
-def random_excursions_test(numbers):
-    cumulative_sums = np.cumsum(2 * np.array(numbers) - 1)
-    unique_states = set(cumulative_sums)
-    p_values = []
-    for state in unique_states:
-        count = sum(cumulative_sums == state)
-        p_value = chisquare([count, len(numbers) - count]).pvalue
-        p_values.append(p_value)
-    return p_values
+# Processar e testar cada DataFrame
+df1_results = process_and_test_dataframe(df1, "df1")
+df2_results = process_and_test_dataframe(df2, "df2")
+df1_results = df1_results.T
+df2_results = df2_results.T
+df1_results["Average"] = df1_results.mean(axis=1)
+df2_results["Average"] = df2_results.mean(axis=1)
+# Exibir os resultados
+print("Resultados para NIST Beacon:")
+print(df1_results)
 
-
-# Função para o Teste de Excursões Aleatórias Variante
-def random_excursions_variant_test(numbers):
-    cumulative_sums = np.cumsum(2 * np.array(numbers) - 1)
-    unique_states = set(cumulative_sums)
-    p_values = []
-    for state in unique_states:
-        count = sum(cumulative_sums == state)
-        p_value = chisquare([count, len(numbers) - count]).pvalue
-        p_values.append(p_value)
-    return p_values
-
-
-print("Frequency Monobit Test p-value:", frequency_monobit_test(random_numbers))
-print(
-    "Longest Runs of Ones Test p-value:", longest_runs_of_ones_test(random_numbers, 100)
-)
-print(
-    "Non-Overlapping Template Matching Test p-value:",
-    non_overlapping_template_matching_test(random_numbers, [1, 0, 1]),
-)
-print(
-    "Overlapping Template Matching Test p-value:",
-    overlapping_template_matching_test(random_numbers, [1, 0, 1]),
-)
-print(
-    "Maurer's Universal Statistical Test p-value:",
-    maurer_universal_test(random_numbers),
-)
-print("Linear Complexity Test p-value:", linear_complexity_test(random_numbers, 100))
-print("Serial Test p-value:", serial_test(random_numbers, 100))
-print(
-    "Approximate Entropy Test p-value:", approximate_entropy_test(random_numbers, 100)
-)
+print("\nResultados para Local Beacon:")
+print(df2_results)
