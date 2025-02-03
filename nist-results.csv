@@ -1,0 +1,10 @@
+,Part 1,Part 2,Part 3,Part 4,Average,Std Dev
+Frequency Monobit Test,0.771,0.106,0.835,0.155,0.467,0.39
+Longest Runs of Ones Test,1.0,1.0,1.0,1.0,1.0,0.0
+Non-Overlapping Template Matching Test,0.22,0.117,0.985,0.765,0.522,0.42
+Overlapping Template Matching Test,0.22,0.117,0.984,0.766,0.522,0.42
+Maurer's Universal Statistical Test,0.254,0.254,0.254,0.254,0.254,0.0
+Linear Complexity Test,1.0,1.0,1.0,1.0,1.0,0.0
+Serial Test,1.0,1.0,1.0,1.0,1.0,0.0
+Approximate Entropy Test,0.508,0.508,0.508,0.508,0.508,0.0
+Size,2079104.0,2079104.0,2079104.0,2079104.0,2079104.0,0.0

@@ -216,9 +216,19 @@ df1_results = df1_results.T
 df2_results = df2_results.T
 df1_results["Average"] = df1_results.mean(axis=1)
 df2_results["Average"] = df2_results.mean(axis=1)
+df1_results["Std Dev"] = df1_results.iloc[:, :-1].std(axis=1)
+df2_results["Std Dev"] = df2_results.iloc[:, :-1].std(axis=1)
+df1_results = df1_results.round(3)
+df2_results = df2_results.round(3)
+
 # Exibir os resultados
+print(df1.count())
+print(df2.count())
 print("Resultados para NIST Beacon:")
 print(df1_results)
 
 print("\nResultados para Local Beacon:")
 print(df2_results)
+
+df1_results.to_csv("df1_results.csv")
+df2_results.to_csv("df2_results.csv")
